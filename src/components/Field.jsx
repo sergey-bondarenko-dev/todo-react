@@ -17,6 +17,7 @@ const Field = (props) => {
         label,
         type,
         className = '',
+        onInput,
     } = props;
     
     return (
@@ -34,6 +35,7 @@ const Field = (props) => {
                 placeholder=" "
                 autoComplete="off"
                 type={type}
+                onInput={onInput}
             />
             </div>
         </>
