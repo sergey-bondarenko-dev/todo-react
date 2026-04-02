@@ -1,18 +1,39 @@
-const Field = () => {
+import clsx from "clsx";
+
+/**
+ * @typedef {Object} FieldProps
+ * @property {string} id
+ * @property {string} label
+ * @property {"search"|"text"} type
+ * @property {string?} className
+ */
+
+/**
+ * @param {FieldProps} props 
+ */
+const Field = (props) => {
+    const {
+        id,
+        label,
+        type,
+        className = '',
+    } = props;
+    
     return (
         <>
-            <div className="todo__field field">
+            <div className={clsx('field', className)}>
             <label
                 className="field__label"
-                htmlFor="new-task"
+                htmlFor={id}
             >
-                New task
+                {label}
             </label>
             <input
                 className="field__input"
-                id="new-task"
+                id={id}
                 placeholder=" "
                 autoComplete="off"
+                type={type}
             />
             </div>
         </>
