@@ -5,9 +5,10 @@ const TodoList = (props) => {
         tasks = [],
         onDeleteButtonClick,
         onTaskCompleteChange,
+        filteredTasks,
     } = props;
 
-    const hasTask = tasks.length > 0;
+    const hasTask = filteredTasks.length > 0;
 
     if (!hasTask) {
         return <div className="todo__empty-message">Not found</div>;
@@ -15,7 +16,7 @@ const TodoList = (props) => {
 
     return (
         <ul className="todo__list">
-            {tasks.map(({ id, isDone, title }) => (
+            {filteredTasks.map(({ id, isDone, title }) => (
                 <TodoItem 
                     className="todo__item"
                     id={id}
