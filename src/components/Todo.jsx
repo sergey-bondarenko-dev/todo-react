@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddTaskForm from "./AddTaskForm";
 import SearchTaskForm from "./SearchTaskForm";
 import TodoInfo from "./TodoInfo";
 import TodoList from "./TodoList";
 
 const Todo = () => {
+
+    const TASK_STORAGE_KEY = 'tasks';
 
     const initialTasks = [
         {
@@ -18,9 +20,28 @@ const Todo = () => {
             isDone: false,
         },
     ];
-    const [tasks, setTasks] = useState(initialTasks);
-    const [filteredTasks, setFilteredTasks] = useState(tasks);
+    const [tasks, setTasks] = useState(() => {
+        const data = localStorage.getItem(TASK_STORAGE_KEY);
+        if (!data) {
+            return initialTasks;
+        }
+
+        try {
+            return JSON.parse(data);
+        } catch {
+            return initialTasks;
+        }
+    });
+    const [query, setQuery] = useState('');
     const [newTaskTitle, setNewTaskTitle] = useState('');
+
+    const filteredTasks = tasks.filter((task) =>
+        task.title.toLowerCase().includes(query.trim().toLowerCase())
+    );
+
+    useEffect(() => {
+        localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
+    }, [tasks]);
 
     const deleteAllTasks = () => {
         const isConfirmed = confirm("Are you sure?");
@@ -50,25 +71,20 @@ const Todo = () => {
         });
     }
 
-    const filterTasks = (query) => {
-        setFilteredTasks(tasks.filter((task) => {
-            return task.title.toLowerCase().includes(query.trim().toLowerCase())
-        }));
-    }
-
     const addTask = () => {
         if (newTaskTitle.trim().length <= 0) {
             return;
         }
 
         const newTask = {
-            id: crypto?.randomUUID() ?? new Date.now().toString(),
+            id: crypto?.randomUUID() ?? Date.now().toString(),
             title: newTaskTitle,
-            idDone: false,
+            isDone: false,
         }
 
         setTasks((tasks) =>  [...tasks, newTask]);
         setNewTaskTitle('');
+        setQuery('');
     }
 
     return (
@@ -79,7 +95,10 @@ const Todo = () => {
                 newTaskTitle={newTaskTitle}
                 setNewTaskTitle={setNewTaskTitle} 
             />
-            <SearchTaskForm onSearchInput={filterTasks} />
+            <SearchTaskForm 
+                query={query}
+                setQuery={setQuery}  
+            />
             <TodoInfo
                 total={tasks.length}
                 done={tasks.filter((task) => task.isDone).length}
