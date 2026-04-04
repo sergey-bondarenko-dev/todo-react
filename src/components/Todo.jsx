@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AddTaskForm from "./AddTaskForm";
 import SearchTaskForm from "./SearchTaskForm";
 import TodoInfo from "./TodoInfo";
@@ -6,7 +6,6 @@ import TodoList from "./TodoList";
 import Button from "./Button";
 
 const Todo = () => {
-
     const TASK_STORAGE_KEY = 'tasks';
 
     const initialTasks = [
@@ -38,9 +37,15 @@ const Todo = () => {
 
     const newTaskTitleInputRef = useRef(null);
 
-    const filteredTasks = tasks.filter((task) =>
-        task.title.toLowerCase().includes(query.trim().toLowerCase())
-    );
+    const filteredTasks = useMemo(() => {
+        return tasks.filter((task) => {
+            return task.title.toLowerCase().includes(query.trim().toLowerCase())
+        })
+    }, [tasks, query]);
+
+    const doneTasks = useMemo(() => {
+        return tasks.filter((task) => task.isDone).length;
+    }, [tasks]);
 
     const firstIncompleteTaskRef = useRef(null);
     const firstIncompleteTaskId = filteredTasks.find((task) => !task.isDone)?.id;
@@ -53,20 +58,20 @@ const Todo = () => {
         localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
     }, [tasks]);
 
-    const deleteAllTasks = () => {
+    const deleteAllTasks = useCallback(() => {
         const isConfirmed = confirm("Are you sure?");
         if (!isConfirmed) return;
 
         setTasks([]);
-    }
+    }, []);
 
-    const deleteTask = (taskId) => {
+    const deleteTask = useCallback((taskId) => {
         setTasks((tasks) => {
             return tasks.filter((task) => task.id !== taskId);
         });
-    }
+    }, []);
 
-    const toggleTaskComplete = (taskId, isDone) => {
+    const toggleTaskComplete = useCallback((taskId, isDone) => {
         setTasks((tasks) => {
             return tasks.map((task) => {
                 if (task.id === taskId) {
@@ -79,9 +84,9 @@ const Todo = () => {
                 return task;
             });
         });
-    }
+    }, []);
 
-    const addTask = () => {
+    const addTask = useCallback(() => {
         if (newTaskTitle.trim().length <= 0) {
             return;
         }
@@ -96,7 +101,7 @@ const Todo = () => {
         setNewTaskTitle('');
         setQuery('');
         newTaskTitleInputRef.current?.focus();
-    }
+    }, [newTaskTitle]);
 
     const scrollToFirstIncompleteTask = () => {
         firstIncompleteTaskRef.current?.scrollIntoView({
@@ -120,7 +125,7 @@ const Todo = () => {
             />
             <TodoInfo
                 total={tasks.length}
-                done={tasks.filter((task) => task.isDone).length}
+                done={doneTasks}
                 onDeleteAllButtonClick={deleteAllTasks}
             />
             <Button onClick={scrollToFirstIncompleteTask}>Show first incomplete task</Button>

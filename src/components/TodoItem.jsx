@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { memo } from "react";
 
 const TodoItem = (props) => {
   const {
@@ -54,4 +55,4 @@ const TodoItem = (props) => {
   );
 }
 
-export default TodoItem;
+export default memo(TodoItem);
