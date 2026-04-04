@@ -15,12 +15,14 @@ const Button = (props) => {
         className,
         children,
         type = 'button',
+        onClick,
     } = props;
     
     return (
         <button 
             className={clsx('button', className)} 
             type={type}
+            onClick={onClick}
         >
             {children}
         </button>

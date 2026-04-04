@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddTaskForm from "./AddTaskForm";
 import SearchTaskForm from "./SearchTaskForm";
 import TodoInfo from "./TodoInfo";
 import TodoList from "./TodoList";
+import Button from "./Button";
 
 const Todo = () => {
 
@@ -35,9 +36,18 @@ const Todo = () => {
     const [query, setQuery] = useState('');
     const [newTaskTitle, setNewTaskTitle] = useState('');
 
+    const newTaskTitleInputRef = useRef(null);
+
     const filteredTasks = tasks.filter((task) =>
         task.title.toLowerCase().includes(query.trim().toLowerCase())
     );
+
+    const firstIncompleteTaskRef = useRef(null);
+    const firstIncompleteTaskId = filteredTasks.find((task) => !task.isDone)?.id;
+
+    useEffect(() => {
+        newTaskTitleInputRef.current?.focus();
+    }, []);
 
     useEffect(() => {
         localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
@@ -85,6 +95,14 @@ const Todo = () => {
         setTasks((tasks) =>  [...tasks, newTask]);
         setNewTaskTitle('');
         setQuery('');
+        newTaskTitleInputRef.current?.focus();
+    }
+
+    const scrollToFirstIncompleteTask = () => {
+        firstIncompleteTaskRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+        });
     }
 
     return (
@@ -94,6 +112,7 @@ const Todo = () => {
                 addTask={addTask}
                 newTaskTitle={newTaskTitle}
                 setNewTaskTitle={setNewTaskTitle} 
+                newTaskTitleInputRef={newTaskTitleInputRef}
             />
             <SearchTaskForm 
                 query={query}
@@ -104,9 +123,12 @@ const Todo = () => {
                 done={tasks.filter((task) => task.isDone).length}
                 onDeleteAllButtonClick={deleteAllTasks}
             />
+            <Button onClick={scrollToFirstIncompleteTask}>Show first incomplete task</Button>
             <TodoList 
                 tasks={tasks}
                 filteredTasks={filteredTasks}
+                firstIncompleteTaskRef={firstIncompleteTaskRef}
+                firstIncompleteTaskId={firstIncompleteTaskId}
                 onDeleteButtonClick={deleteTask}
                 onTaskCompleteChange={toggleTaskComplete}
             />
