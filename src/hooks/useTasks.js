@@ -74,14 +74,14 @@ const useTasks = () => {
         });
     }, []);
 
-    const addTask = useCallback(() => {
-        if (newTaskTitle.trim().length <= 0) {
+    const addTask = useCallback((title) => {
+        if (title.length <= 0) {
             return;
         }
 
         const newTask = {
             id: crypto?.randomUUID() ?? Date.now().toString(),
-            title: newTaskTitle,
+            title: title,
             isDone: false,
         }
 
@@ -89,7 +89,7 @@ const useTasks = () => {
         setNewTaskTitle('');
         setQuery('');
         newTaskTitleInputRef.current?.focus();
-    }, [newTaskTitle]);
+    }, []);
 
     return {
         tasks,

@@ -16,6 +16,7 @@ const Button = (props) => {
         children,
         type = 'button',
         onClick,
+        isDisabled,
     } = props;
     
     return (
@@ -23,6 +24,7 @@ const Button = (props) => {
             className={clsx('button', className)} 
             type={type}
             onClick={onClick}
+            disabled={isDisabled}
         >
             {children}
         </button>
