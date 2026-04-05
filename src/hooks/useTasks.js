@@ -5,28 +5,10 @@ import {
     useRef, 
     useEffect
 } from "react";
-import useTasksLocalStorage from "./useTasksLocalStorage";
+import tasksApi from "../api/tasksApi";
 
 const useTasks = () => {
-    const initialTasks = [
-        {
-            id: 'task-1',
-            title: 'Task 1',
-            isDone: true,
-        },
-        {
-            id: 'task-2',
-            title: 'Task 2',
-            isDone: false,
-        },
-    ];
-
-    const {
-        savedTasks,
-        saveTasks,
-    } = useTasksLocalStorage();
-
-    const [tasks, setTasks] = useState(savedTasks ?? initialTasks);
+    const [tasks, setTasks] = useState([]);
     const [query, setQuery] = useState('');
     const [newTaskTitle, setNewTaskTitle] = useState('');
 
@@ -40,38 +22,44 @@ const useTasks = () => {
 
     useEffect(() => {
         newTaskTitleInputRef.current?.focus();
-    }, []);
 
-    useEffect(() => {
-        saveTasks(tasks);
-    }, [tasks]);
+        tasksApi.getAll()
+            .then((tasks) => setTasks(tasks));
+    }, []);
 
     const deleteAllTasks = useCallback(() => {
         const isConfirmed = confirm("Are you sure?");
         if (!isConfirmed) return;
 
-        setTasks([]);
-    }, []);
+        tasksApi.deleteAll(tasks)
+            .then(() => setTasks([]));
+    }, [tasks]);
 
     const deleteTask = useCallback((taskId) => {
-        setTasks((tasks) => {
-            return tasks.filter((task) => task.id !== taskId);
-        });
+        tasksApi.delete(taskId)
+            .then(() => {
+                setTasks((tasks) => {
+                    return tasks.filter((task) => task.id !== taskId);
+                });
+            });
     }, []);
 
     const toggleTaskComplete = useCallback((taskId, isDone) => {
-        setTasks((tasks) => {
-            return tasks.map((task) => {
-                if (task.id === taskId) {
-                    return {
-                        ...task,
-                        isDone,
-                    }
-                }
+        tasksApi.toggleComplete(taskId, isDone)
+            .then(() => {
+                setTasks((tasks) => {
+                    return tasks.map((task) => {
+                        if (task.id === taskId) {
+                            return {
+                                ...task,
+                                isDone,
+                            }
+                        }
 
-                return task;
+                        return task;
+                    });
+                });
             });
-        });
     }, []);
 
     const addTask = useCallback((title) => {
@@ -79,16 +67,13 @@ const useTasks = () => {
             return;
         }
 
-        const newTask = {
-            id: crypto?.randomUUID() ?? Date.now().toString(),
-            title: title,
-            isDone: false,
-        }
-
-        setTasks((tasks) =>  [...tasks, newTask]);
-        setNewTaskTitle('');
-        setQuery('');
-        newTaskTitleInputRef.current?.focus();
+        tasksApi.add(title)
+            .then((addedTask) => {
+                setTasks((tasks) =>  [...tasks, addedTask]);
+                setNewTaskTitle('');
+                setQuery('');
+                newTaskTitleInputRef.current?.focus();
+            });
     }, []);
 
     return {
