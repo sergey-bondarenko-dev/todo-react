@@ -6,6 +6,7 @@
  */
 
 import clsx from "clsx";
+import styles from './Button.module.scss';
 
 /**
  * @param {ButtonProps} props 
@@ -21,7 +22,7 @@ const Button = (props) => {
     
     return (
         <button 
-            className={clsx('button', className)} 
+            className={clsx(styles.button, className)} 
             type={type}
             onClick={onClick}
             disabled={isDisabled}

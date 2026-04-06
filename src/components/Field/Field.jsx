@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import styles from './Field.module.scss';
 
 /**
  * @typedef {Object} FieldProps
@@ -25,15 +26,15 @@ const Field = (props) => {
     
     return (
         <>
-            <div className={clsx('field', className)}>
+            <div className={clsx(styles.field, className)}>
             <label
-                className="field__label"
+                className={styles.label}
                 htmlFor={id}
             >
                 {label}
             </label>
             <input
-                className={clsx('field__input', error ? 'is-invalid' : '')}
+                className={clsx(styles.input, error ? styles.isInvalid : '')}
                 id={id}
                 placeholder=" "
                 autoComplete="off"
@@ -43,7 +44,7 @@ const Field = (props) => {
                 ref={ref}
             />
             {error && (
-                <span className="field__error" title={error}>
+                <span className={styles.error} title={error}>
                     {error}
                 </span>
             )}

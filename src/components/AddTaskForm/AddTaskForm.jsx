@@ -1,9 +1,9 @@
-import Field from "./Field";
-import Button from "./Button";
+import Field from "../Field";
+import Button from "../Button";
 import { useContext, useState } from "react";
-import { TasksContext } from "../context/TasksContext";
+import { TasksContext } from "../../context/TasksContext";
 
-const AddTaskForm = () => {
+const AddTaskForm = ({ styles }) => {
     const {
         addTask,
         newTaskTitle,
@@ -34,12 +34,12 @@ const AddTaskForm = () => {
     }
 
     return (
-        <form className="todo__form" onSubmit={onSubmit}>
+        <form className={styles.form} onSubmit={onSubmit}>
             <Field 
                 id="new-task" 
                 label="New task title" 
                 type="text" 
-                className="todo__field"
+                className={styles.field}
                 value={newTaskTitle}
                 onInput={onInput}
                 ref={newTaskTitleInputRef}
