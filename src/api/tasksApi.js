@@ -8,6 +8,10 @@ const tasksApi = {
         return fetch(URL)
             .then((response) => response.json());
     },
+    getById: (taskId) => {
+        return fetch(`${URL}/${taskId}`)
+            .then((response) => response.json());
+    },
     delete: (taskId) => {
         return fetch(`${URL}/${taskId}`, {
             method: 'DELETE',

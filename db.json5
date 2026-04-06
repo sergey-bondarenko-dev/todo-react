@@ -1,1 +1,1 @@
-{tasks:[{title:'qweqweqw',isDone:false,id:'4NRSEU74uds'},{title:'ewqwe12',isDone:false,id:'l7jAihUq-ec'}],$schema:'./node_modules/json-server/schema.json'}
+{tasks:[{title:'qweqweqw',isDone:false,id:'4NRSEU74uds'},{title:'ewqwe12',isDone:true,id:'l7jAihUq-ec'}],$schema:'./node_modules/json-server/schema.json'}
