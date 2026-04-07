@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { memo, useContext } from "react";
+import { memo, useContext, useRef } from "react";
 import { TasksContext } from "../../context/TasksContext";
 import RouterLink from "../RouterLink";
 import styles from './TodoItem.module.scss';
@@ -17,11 +17,18 @@ const TodoItem = (props) => {
     toggleTaskComplete,
     firstIncompleteTaskId,
     firstIncompleteTaskRef,
+    disappearingTaskId,
+    appearingTaskId,
   } = useContext(TasksContext);
 
   return (
       <li 
-        className={clsx(styles.root, className)}
+        className={clsx(
+          styles.root, 
+          className, 
+          disappearingTaskId === id ? styles.isDisappearing : '',
+          appearingTaskId === id ? styles.isAppearing : '',
+        )}
         ref={id === firstIncompleteTaskId ? firstIncompleteTaskRef : null}
       >
         <input
