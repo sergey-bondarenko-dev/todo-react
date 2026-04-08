@@ -1,15 +1,15 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 
 const useIncompleteTaskScroll = (filteredTasks) => {
     const firstIncompleteTaskRef = useRef(null);
     const firstIncompleteTaskId = filteredTasks.find((task) => !task.isDone)?.id;
     
-    const scrollToFirstIncompleteTask = () => {
+    const scrollToFirstIncompleteTask = useCallback(() => {
         firstIncompleteTaskRef.current?.scrollIntoView({
             behavior: 'smooth',
             block: 'center',
         });
-    }
+    }, []);
 
     return {
         firstIncompleteTaskId,
