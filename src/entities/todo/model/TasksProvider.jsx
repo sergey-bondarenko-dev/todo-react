@@ -1,8 +1,7 @@
-import { createContext, useMemo } from "react";
-import useTasks from "./useTasks";
-import useIncompleteTaskScroll from "./useIncompleteTaskScroll";
-
-export const TasksContext = createContext({}); 
+import { useMemo } from 'react';
+import useTasks from './useTasks';
+import useIncompleteTaskScroll from './useIncompleteTaskScroll';
+import { TasksContext } from './TasksContext';
 
 export const TasksProvider = (props) => {
     const {

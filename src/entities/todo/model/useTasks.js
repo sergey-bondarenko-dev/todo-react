@@ -58,7 +58,9 @@ const useTasks = () => {
 
     const deleteAllTasks = useCallback(() => {
         const isConfirmed = confirm("Are you sure?");
-        if (!isConfirmed) return;
+        if (!isConfirmed) {
+            return;
+        };
 
         tasksApi.deleteAll(tasks)
             .then(() => dispatch({ type: 'DELETE_ALL' }));

@@ -11,9 +11,7 @@ const App = () => {
   }
   
   return (
-    <Router routes={routes}>
-
-    </Router>
+    <Router routes={routes} />
   );
 }
 

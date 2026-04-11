@@ -25,8 +25,7 @@ const Field = (props) => {
     } = props;
     
     return (
-        <>
-            <div className={clsx(styles.field, className)}>
+        <div className={clsx(styles.field, className)}>
             <label
                 className={styles.label}
                 htmlFor={id}
@@ -48,8 +47,7 @@ const Field = (props) => {
                     {error}
                 </span>
             )}
-            </div>
-        </>
+        </div>
     );
 }
 
