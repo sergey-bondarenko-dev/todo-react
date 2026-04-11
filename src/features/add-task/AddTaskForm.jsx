@@ -4,12 +4,12 @@ import { useContext, useState } from "react";
 import { TasksContext } from "@/entities/todo";
 
 const AddTaskForm = ({ styles }) => {
+    const [newTaskTitle, setNewTaskTitle] = useState('');
+
     const {
         addTask,
-        newTaskTitle,
-        setNewTaskTitle,
         newTaskTitleInputRef,
-} = useContext(TasksContext);
+    } = useContext(TasksContext);
 
     const [error, setError] = useState('');
 
@@ -20,7 +20,7 @@ const AddTaskForm = ({ styles }) => {
         event.preventDefault();
 
         if (!isTitleEmpty) {
-            addTask(clearTitle);
+            addTask(clearTitle, () => setNewTaskTitle(''));
         }
     }
 

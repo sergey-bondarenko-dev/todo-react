@@ -38,7 +38,6 @@ const tasksReducer = (state, action) => {
 const useTasks = () => {
     const [tasks, dispatch] = useReducer(tasksReducer, []);
     const [query, setQuery] = useState('');
-    const [newTaskTitle, setNewTaskTitle] = useState('');
     const [disappearingTaskId, setDisappearingTaskId] = useState(null);
     const [appearingTaskId, setAppearingTaskId] = useState(null);
 
@@ -83,7 +82,7 @@ const useTasks = () => {
             });
     }, []);
 
-    const addTask = useCallback((title) => {
+    const addTask = useCallback((title, afterCallback) => {
         if (title.length <= 0) {
             return;
         }
@@ -91,7 +90,7 @@ const useTasks = () => {
         tasksApi.add(title)
             .then((addedTask) => {
                 dispatch({ type: 'ADD', task: addedTask });
-                setNewTaskTitle('');
+                afterCallback();
                 setQuery('');
                 newTaskTitleInputRef.current?.focus();
                 setAppearingTaskId(addedTask.id);
@@ -107,8 +106,6 @@ const useTasks = () => {
         deleteTask,
         deleteAllTasks,
         toggleTaskComplete,
-        newTaskTitle,
-        setNewTaskTitle,
         query,
         setQuery,
         newTaskTitleInputRef,
