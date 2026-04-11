@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getAppRelativePath, normalizePath } from "@/shared/utils/url";
 
 const matchPath = (path, route) => {
     const pathParts = normalizePath(path).split('/');
@@ -22,12 +23,16 @@ const matchPath = (path, route) => {
     return params;
 }
 
+const getCurrentPath = () => {
+    return getAppRelativePath(window.location.pathname);
+}
+
 export const useRoute = () => {
-    const [path, setPath] = useState(normalizePath(window.location.pathname));
+    const [path, setPath] = useState(normalizePath(getCurrentPath()));
 
     useEffect(() => {
         const onLocationChange = () => {
-            setPath(window.location.pathname);
+            setPath(getCurrentPath());
         }
 
         window.addEventListener('popstate', onLocationChange);
@@ -56,11 +61,5 @@ const Router = (props) => {
     const NotFound = routes['*'];
     return <NotFound />;
 }
-
-const normalizePath = (pathname) => {
-    if (!pathname) return "/";
-    const normalized = pathname.replace(/\/+$/, "");
-    return normalized || "/";
-};
 
 export default Router;
