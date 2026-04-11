@@ -37,5 +37,5 @@ export const getAppRelativePath = (pathname = "/") => {
         return `/${normalizedPathname.slice(normalizedBaseUrl.length + 1)}`;
     }
 
-    return normalizedPath(pathname);
+    return normalizePath(pathname);
 };
