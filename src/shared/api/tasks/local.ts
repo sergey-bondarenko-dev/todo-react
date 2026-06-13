@@ -1,6 +1,8 @@
+import type { Task, TasksApi } from "./type";
+
 const STORAGE_KEY = 'tasks';
 
-const read = () => {
+const read = (): Task[] => {
     try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     } catch {
@@ -8,7 +10,7 @@ const read = () => {
     }
 }
 
-const write = (tasks) => {
+const write = (tasks: Task[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
@@ -18,7 +20,7 @@ const delay = (ms = 150) => {
     });
 }
 
-const localAPI = {
+const localAPI: TasksApi = {
     getAll: async () => {
         await delay();
         return read();
