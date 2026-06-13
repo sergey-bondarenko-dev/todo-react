@@ -3,9 +3,9 @@ import type { InputHTMLAttributes, Ref } from "react";
 import styles from './Field.module.scss';
 
 type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
-    label: string,
-    ref: Ref<HTMLInputElement>;
-    error: string;
+    label?: string,
+    ref?: Ref<HTMLInputElement>;
+    error?: string;
 
 }
 
