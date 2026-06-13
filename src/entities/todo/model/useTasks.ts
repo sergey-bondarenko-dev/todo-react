@@ -7,8 +7,16 @@ import {
     useReducer,
 } from "react";
 import tasksApi from "@/shared/api/tasks";
+import type { Task } from "@/shared/api/tasks/type";
 
-const tasksReducer = (state, action) => {
+type TasksAction =
+    | { type: 'SET_ALL'; tasks: Task[] }
+    | { type: 'ADD'; task: Task }
+    | { type: 'TOGGLE_COMPLETE'; id: string; isDone: boolean }
+    | { type: 'DELETE'; id: string }
+    | { type: 'DELETE_ALL' };
+
+const tasksReducer = (state: Task[], action: TasksAction) => {
     switch (action.type) {
         case 'SET_ALL': {
             return Array.isArray(action.tasks) ? action.tasks : state;
@@ -38,10 +46,10 @@ const tasksReducer = (state, action) => {
 const useTasks = () => {
     const [tasks, dispatch] = useReducer(tasksReducer, []);
     const [query, setQuery] = useState('');
-    const [disappearingTaskId, setDisappearingTaskId] = useState(null);
-    const [appearingTaskId, setAppearingTaskId] = useState(null);
+    const [disappearingTaskId, setDisappearingTaskId] = useState<string | null>(null);
+    const [appearingTaskId, setAppearingTaskId] = useState<string | null>(null);
 
-    const newTaskTitleInputRef = useRef(null);
+    const newTaskTitleInputRef = useRef<HTMLInputElement>(null);
 
     const filteredTasks = useMemo(() => {
         return tasks.filter((task) => {
@@ -66,7 +74,7 @@ const useTasks = () => {
             .then(() => dispatch({ type: 'DELETE_ALL' }));
     }, [tasks]);
 
-    const deleteTask = useCallback((taskId) => {
+    const deleteTask = useCallback((taskId: string) => {
         tasksApi.delete(taskId)
             .then(() => {
                 setDisappearingTaskId(taskId);
@@ -77,14 +85,14 @@ const useTasks = () => {
             });
     }, []);
 
-    const toggleTaskComplete = useCallback((taskId, isDone) => {
+    const toggleTaskComplete = useCallback((taskId: string, isDone: boolean) => {
         tasksApi.toggleComplete(taskId, isDone)
             .then(() => {
                 dispatch({ type: 'TOGGLE_COMPLETE', id: taskId, isDone })
             });
     }, []);
 
-    const addTask = useCallback((title, afterCallback) => {
+    const addTask = useCallback((title: string, afterCallback: () => void) => {
         if (title.length <= 0) {
             return;
         }

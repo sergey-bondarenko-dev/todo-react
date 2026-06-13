@@ -1,9 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import useTasks from './useTasks';
 import useIncompleteTaskScroll from './useIncompleteTaskScroll';
 import { TasksContext } from './TasksContext';
 
-export const TasksProvider = (props) => {
+type TasksProviderProps = {
+    children: ReactNode;
+}
+
+export const TasksProvider = (props: TasksProviderProps) => {
     const {
         children,
     } = props;
