@@ -1,23 +1,18 @@
-
-/**
- * @typedef {Object} ButtonProps
- * @property {string} className
- * @property {"submit"|"button"|"reset"} type
- */
-
 import clsx from "clsx";
 import styles from './Button.module.scss';
+import type { ReactNode, ButtonHTMLAttributes } from "react";
 
-/**
- * @param {ButtonProps} props 
- */
-const Button = (props) => {
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+    children: ReactNode;
+}
+
+const Button = (props: ButtonProps) => {
     const {
         className,
         children,
         type = 'button',
         onClick,
-        isDisabled,
+        disabled: isDisabled,
     } = props;
     
     return (

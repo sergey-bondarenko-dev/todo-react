@@ -1,11 +1,18 @@
 import clsx from "clsx";
-import { memo, useContext } from "react";
-import { TasksContext } from "../../";
+import { memo } from "react";
 import RouterLink from "@/shared/ui/RouterLink";
+import { highlightCaseInsensitive } from "@/shared/utils/highlight";
+import { useTasksContext } from "../../model/useTasksContext";
 import styles from './TodoItem.module.scss';
-import { highlightCaseInsensitive } from "../../../../shared/utils/highlight";
 
-const TodoItem = (props) => {
+type TodoItemProps = {
+  className?: string,
+  id: string,
+  title: string,
+  isDone: boolean;
+}
+
+const TodoItem = (props: TodoItemProps) => {
   const {
     className = '',
     id,
@@ -21,7 +28,7 @@ const TodoItem = (props) => {
     disappearingTaskId,
     appearingTaskId,
     query,
-  } = useContext(TasksContext);
+  } = useTasksContext();
 
   const highlightedTitle = highlightCaseInsensitive(title, query);
 

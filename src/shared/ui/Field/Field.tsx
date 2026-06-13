@@ -1,18 +1,15 @@
 import clsx from "clsx";
+import type { InputHTMLAttributes, Ref } from "react";
 import styles from './Field.module.scss';
 
-/**
- * @typedef {Object} FieldProps
- * @property {string} id
- * @property {string} label
- * @property {"search"|"text"} type
- * @property {string?} className
- */
+type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
+    label?: string,
+    ref?: Ref<HTMLInputElement>;
+    error?: string;
 
-/**
- * @param {FieldProps} props 
- */
-const Field = (props) => {
+}
+
+const Field = (props: FieldProps) => {
     const {
         id,
         label,
@@ -25,8 +22,7 @@ const Field = (props) => {
     } = props;
     
     return (
-        <>
-            <div className={clsx(styles.field, className)}>
+        <div className={clsx(styles.field, className)}>
             <label
                 className={styles.label}
                 htmlFor={id}
@@ -48,8 +44,7 @@ const Field = (props) => {
                     {error}
                 </span>
             )}
-            </div>
-        </>
+        </div>
     );
 }
 

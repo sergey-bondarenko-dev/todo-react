@@ -1,22 +1,26 @@
 import Field from "@/shared/ui/Field";
 import Button from "@/shared/ui/Button";
-import { useContext, useState } from "react";
-import { TasksContext } from "@/entities/todo";
+import { useState, type InputEvent, type SubmitEvent } from "react";
+import { useTasksContext } from "@/entities/todo/model/useTasksContext";
 
-const AddTaskForm = ({ styles }) => {
+type AddTaskFormProps = {
+    styles: CSSModuleClasses
+}
+
+const AddTaskForm = ({ styles }: AddTaskFormProps) => {
     const [newTaskTitle, setNewTaskTitle] = useState('');
 
     const {
         addTask,
         newTaskTitleInputRef,
-    } = useContext(TasksContext);
+    } = useTasksContext();
 
     const [error, setError] = useState('');
 
     const clearTitle = newTaskTitle.trim();
     const isTitleEmpty = clearTitle.length === 0;
 
-    const onSubmit = (event) => {
+    const onSubmit = (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!isTitleEmpty) {
@@ -24,8 +28,8 @@ const AddTaskForm = ({ styles }) => {
         }
     }
 
-    const onInput = (event) => {
-        const { value } = event.target;
+    const onInput = (event: InputEvent<HTMLInputElement>) => {
+        const { value } = event.currentTarget;
         const clearValue = value.trim();
         const hasOnlySpaces = clearValue.length === 0 && value.length > 0;
 
@@ -47,7 +51,7 @@ const AddTaskForm = ({ styles }) => {
             />
             <Button 
                 type="submit"
-                isDisabled={isTitleEmpty}
+                disabled={isTitleEmpty}
             >
                 Add
             </Button>

@@ -1,12 +1,16 @@
-import { memo, useContext } from "react";
+import { memo } from "react";
 import TodoItem from "../TodoItem";
-import { TasksContext } from "../../";
+import { useTasksContext } from "../../model/useTasksContext";
 
-const TodoList = ({ styles }) => {
+type TodoListProps = {
+    styles: CSSModuleClasses;
+}
+
+const TodoList = ({ styles }: TodoListProps) => {
     const {
         tasks,
         filteredTasks,
-    } = useContext(TasksContext);
+    } = useTasksContext();
 
     const hasTask = tasks.length > 0;
     const isEmptyFilteredTasks = filteredTasks?.length <= 0;

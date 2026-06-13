@@ -1,3 +1,5 @@
+import type { Task } from "@/shared/api/tasks/type";
+
 const useTasksLocalStorage = () => {
     const TASK_STORAGE_KEY = 'tasks';
 
@@ -14,7 +16,7 @@ const useTasksLocalStorage = () => {
         }
     }
 
-    const saveTasks = (tasks) => {
+    const saveTasks = (tasks: Task[]) => {
         localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
     }
 

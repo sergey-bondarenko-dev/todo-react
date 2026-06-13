@@ -1,9 +1,11 @@
+import type { TasksApi } from "./type";
+
 const URL = 'http://localhost:3001/tasks';
 const headers = {
     'Content-Type': 'application/json',
 };
 
-const serverApi = {
+const serverApi: TasksApi = {
     getAll: () => {
         return fetch(URL)
             .then((response) => response.json());
@@ -12,13 +14,13 @@ const serverApi = {
         return fetch(`${URL}/${taskId}`)
             .then((response) => response.json());
     },
-    delete: (taskId) => {
-        return fetch(`${URL}/${taskId}`, {
+    delete: async (taskId) => {
+        await fetch(`${URL}/${taskId}`, {
             method: 'DELETE',
         });
     },
-    deleteAll: (tasks) => {
-        return Promise.all(tasks.map((task) => {
+    deleteAll: async (tasks) => {
+        await Promise.all(tasks.map((task) => {
             return serverApi.delete(task.id);
         }));
     },

@@ -1,14 +1,13 @@
 import AddTaskForm from "@/features/add-task";
 import SearchTaskForm from "@/features/search-task";
 import TodoInfo from "@/features/stats";
-import { TodoList} from "@/entities/todo";
+import { TodoList } from "@/entities/todo";
 import Button from "@/shared/ui/Button";
-import { useContext } from "react";
-import { TasksContext } from "@/entities/todo";
 import styles from './Todo.module.scss';
+import { useTasksContext } from "@/entities/todo/model/useTasksContext";
 
 const Todo = () => {
-    const { scrollToFirstIncompleteTask } = useContext(TasksContext);
+    const { scrollToFirstIncompleteTask } = useTasksContext();
 
     return (
         <div className={styles.todo}>
