@@ -1,6 +1,12 @@
+import type { MouseEvent, ReactNode } from "react";
 import { buildAppPath } from "../../utils/url";
 
-const RouterLink = (props) => {
+type RouterLinkProps = {
+    to: string;
+    children: ReactNode;
+}
+
+const RouterLink = (props: RouterLinkProps) => {
     const {
         to,
         children,
@@ -9,7 +15,7 @@ const RouterLink = (props) => {
 
     const href = buildAppPath(to);
 
-    const handleClick = (event) => {
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
         window.history.pushState({}, '', href);
         window.dispatchEvent(new PopStateEvent('popstate'));
