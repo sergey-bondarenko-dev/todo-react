@@ -1,5 +1,7 @@
-const useCombinedRefs = (...refs) => {
-    return (node) => {
+import type { Ref } from "react"
+
+const useCombinedRefs = <T>(...refs: Array<Ref<T> | null | undefined>) => {
+    return (node: T | null) => {
         refs.forEach((ref) => {
             if (!ref) {
                 return;
