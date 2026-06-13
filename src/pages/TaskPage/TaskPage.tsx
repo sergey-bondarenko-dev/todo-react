@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
 import tasksApi from "@/shared/api/tasks";
 import type { Task } from "@/shared/api/tasks/type";
+import type { PageProps } from "@/app/routing/Router";
 
-type TaskPageProps = {
-    params: {
-        id: string;
-    };
-}
+type TaskPageProps = PageProps;
 
 const TaskPage = (props: TaskPageProps) => {
     const { params } = props;

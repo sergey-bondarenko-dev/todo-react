@@ -1,7 +1,22 @@
 import { normalizePath } from "@/shared/utils/url";
 import { useRoute } from "./useRoute";
+import type { ComponentType } from "react";
 
-const matchPath = (path, route) => {
+export type RouteParams = Record<string, string>;
+
+export type PageProps = {
+    params: RouteParams;
+}
+
+type RouteComponent = ComponentType<PageProps>;
+
+export type Routes = Record<string, RouteComponent>;
+
+type RouterProps = {
+    routes: Routes;
+}
+
+const matchPath = (path: string, route: string) => {
     const pathParts = normalizePath(path).split('/');
     const routeParts = normalizePath(route).split('/');
 
@@ -9,7 +24,7 @@ const matchPath = (path, route) => {
         return null;
     }
 
-    const params = {};
+    const params: Record<string, string> = {};
 
     for (let i = 0; i < routeParts.length; i++) {
         if (routeParts[i].startsWith(':')) {
@@ -23,7 +38,7 @@ const matchPath = (path, route) => {
     return params;
 }
 
-const Router = (props) => {
+const Router = (props: RouterProps) => {
     const { routes } = props;
     const path = useRoute();
 
@@ -37,7 +52,7 @@ const Router = (props) => {
     }
 
     const NotFound = routes['*'];
-    return <NotFound />;
+    return <NotFound params={{}}/>;
 }
 
 export default Router;
