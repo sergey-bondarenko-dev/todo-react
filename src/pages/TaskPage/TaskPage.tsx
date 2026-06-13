@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import tasksApi from "@/shared/api/tasks";
+import type { Task } from "@/shared/api/tasks/type";
 
-const TaskPage = (props) => {
+type TaskPageProps = {
+    params: {
+        id: string;
+    };
+}
+
+const TaskPage = (props: TaskPageProps) => {
     const { params } = props;
     const id = params.id;
 
-    const [task, setTask] = useState(null);
+    const [task, setTask] = useState<Task | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
 
@@ -35,8 +42,8 @@ const TaskPage = (props) => {
 
     return (
         <div>
-            <h1>{task.title}</h1>
-            <p>{task.isDone ? "Task is done" : "Task is not done"}</p>
+            <h1>{task?.title}</h1>
+            <p>{task?.isDone ? "Task is done" : "Task is not done"}</p>
         </div>
     );
 }
