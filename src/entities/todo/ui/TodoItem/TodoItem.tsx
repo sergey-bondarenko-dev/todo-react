@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { memo } from "react";
-import RouterLink from "@/shared/ui/RouterLink";
 import { highlightCaseInsensitive } from "@/shared/utils/highlight";
 import { useTasksContext } from "../../model/useTasksContext";
 import styles from './TodoItem.module.scss';
+import { Link } from "react-router-dom";
 
 type TodoItemProps = {
   className?: string,
@@ -57,12 +57,12 @@ const TodoItem = (props: TodoItemProps) => {
         >
           {title}
         </label>
-        <RouterLink
+        <Link
           to={`/tasks/${id}`}
           aria-label="Task detail page"
         >
           <span dangerouslySetInnerHTML={{ __html: highlightedTitle }} />
-        </RouterLink>
+        </Link>
         <button
           className={styles.deleteButton}
           aria-label="Delete"

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import tasksApi from "@/shared/api/tasks";
 import type { Task } from "@/shared/api/tasks/type";
-import type { PageProps } from "@/app/routing/Router";
+import { useParams } from "react-router-dom";
 
-type TaskPageProps = PageProps;
+const TaskPage = () => {
+    const { id } = useParams<{ id: string }>();
 
-const TaskPage = (props: TaskPageProps) => {
-    const { params } = props;
-    const id = params.id;
+    if (!id) {
+        return <div>Task not found</div>;
+    }
 
     const [task, setTask] = useState<Task | null>(null);
     const [isLoading, setIsLoading] = useState(true);
