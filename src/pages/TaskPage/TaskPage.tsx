@@ -1,40 +1,22 @@
-import { useEffect, useState } from "react";
-import tasksApi from "@/shared/api/tasks";
-import type { Task } from "@/shared/api/tasks/type";
 import { useParams } from "react-router-dom";
+import { useGetTaskByIdQuery } from "@/entities/todo/api";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const TaskPage = () => {
     const { id } = useParams<{ id: string }>();
+    const { data: task, error, isLoading } = useGetTaskByIdQuery(id ?? skipToken);
 
-    if (!id) {
-        return <div>Task not found</div>;
-    }
-
-    const [task, setTask] = useState<Task | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [hasError, setHasError] = useState(false);
-
-    useEffect(() => {
-        setIsLoading(true);
-        setTask(null);
-        tasksApi.getById(id)
-            .then((taskData) => {
-                setTask(taskData);
-                setHasError(false);
-            })
-            .catch(() => {
-                setHasError(true);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
-    }, [id]);
+    const hasError = !!error;
 
     if (isLoading) {
         return <div>Loading...</div>;
     }
 
     if (hasError) {
+        return <div>Task not found</div>;
+    }
+
+    if (!task) {
         return <div>Task not found</div>;
     }
 

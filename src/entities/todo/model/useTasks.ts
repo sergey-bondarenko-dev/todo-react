@@ -4,54 +4,33 @@ import {
     useCallback, 
     useRef, 
     useEffect,
-    useReducer,
 } from "react";
-import tasksApi from "@/shared/api/tasks";
-import type { Task } from "@/shared/api/tasks/type";
-
-type TasksAction =
-    | { type: 'SET_ALL'; tasks: Task[] }
-    | { type: 'ADD'; task: Task }
-    | { type: 'TOGGLE_COMPLETE'; id: string; isDone: boolean }
-    | { type: 'DELETE'; id: string }
-    | { type: 'DELETE_ALL' };
-
-const tasksReducer = (state: Task[], action: TasksAction) => {
-    switch (action.type) {
-        case 'SET_ALL': {
-            return Array.isArray(action.tasks) ? action.tasks : state;
-        }
-        case 'ADD': {
-            return [...state, action.task];
-        }
-        case 'TOGGLE_COMPLETE': {
-            const { id, isDone } = action;
-
-            return state.map((task) => {
-                return task.id === id ? { ...task, isDone } : task;
-            });
-        }
-        case 'DELETE': {
-            return state.filter((task) => task.id !== action.id);
-        }
-        case 'DELETE_ALL': {
-            return [];
-        }
-        default: {
-            return state;
-        }
-    }
-}
+import { 
+    useAddTaskMutation, 
+    useDeleteAllTasksMutation, 
+    useDeleteTaskMutation, 
+    useGetTasksQuery, 
+    useToggleCompleteTaskMutation 
+} from "../api";
 
 const useTasks = () => {
-    const [tasks, dispatch] = useReducer(tasksReducer, []);
+    const { data: tasks } = useGetTasksQuery();
     const [query, setQuery] = useState('');
     const [disappearingTaskId, setDisappearingTaskId] = useState<string | null>(null);
     const [appearingTaskId, setAppearingTaskId] = useState<string | null>(null);
 
+    const [add] = useAddTaskMutation();
+    const [deleteById] = useDeleteTaskMutation();
+    const [deleteAll] = useDeleteAllTasksMutation();
+    const [toggleComplete] = useToggleCompleteTaskMutation();
+
     const newTaskTitleInputRef = useRef<HTMLInputElement>(null);
 
     const filteredTasks = useMemo(() => {
+        if (!tasks) {
+            return [];
+        }
+        
         return tasks.filter((task) => {
             return task.title.toLowerCase().includes(query.trim().toLowerCase())
         })
@@ -59,9 +38,6 @@ const useTasks = () => {
 
     useEffect(() => {
         newTaskTitleInputRef.current?.focus();
-
-        tasksApi.getAll()
-            .then((tasks) => dispatch({ type: 'SET_ALL', tasks }));
     }, []);
 
     const deleteAllTasks = useCallback(() => {
@@ -70,36 +46,34 @@ const useTasks = () => {
             return;
         };
 
-        tasksApi.deleteAll(tasks)
-            .then(() => dispatch({ type: 'DELETE_ALL' }));
-    }, [tasks]);
+        deleteAll(tasks ?? []);
+    }, [tasks, deleteAll]);
 
     const deleteTask = useCallback((taskId: string) => {
-        tasksApi.delete(taskId)
+        deleteById(taskId)
+            .unwrap()
             .then(() => {
                 setDisappearingTaskId(taskId);
                 setTimeout(() => {
-                    dispatch({ type: 'DELETE', id: taskId });
                     setDisappearingTaskId(null);
                 }, 400);
             });
-    }, []);
+    }, [deleteById]);
 
     const toggleTaskComplete = useCallback((taskId: string, isDone: boolean) => {
-        tasksApi.toggleComplete(taskId, isDone)
-            .then(() => {
-                dispatch({ type: 'TOGGLE_COMPLETE', id: taskId, isDone })
-            });
-    }, []);
+        toggleComplete({ id: taskId, isDone });
+    }, [toggleComplete]);
 
     const addTask = useCallback((title: string, afterCallback: () => void) => {
         if (title.length <= 0) {
             return;
         }
 
-        tasksApi.add(title)
-            .then((addedTask) => {
-                dispatch({ type: 'ADD', task: addedTask });
+        add(title)
+            .unwrap()
+            .then((addedTask) => {       
+                if (!addedTask) return;
+
                 afterCallback();
                 setQuery('');
                 newTaskTitleInputRef.current?.focus();
@@ -108,10 +82,10 @@ const useTasks = () => {
                     setAppearingTaskId(null);
                 }, 400);
             });
-    }, []);
+    }, [add]);
 
     return {
-        tasks,
+        tasks: tasks ?? [],
         filteredTasks,
         deleteTask,
         deleteAllTasks,
