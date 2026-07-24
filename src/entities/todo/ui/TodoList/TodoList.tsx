@@ -1,34 +1,42 @@
-import { memo } from "react";
+import { memo, type RefObject } from "react";
+import type { Task } from "@/shared/api/tasks/type";
 import TodoItem from "../TodoItem";
-import { useTasksContext } from "../../model/useTasksContext";
 
 type TodoListProps = {
     styles: CSSModuleClasses;
+    tasks: Task[];
+    hasAnyTasks: boolean;
+    query: string;
+    firstIncompleteTaskId?: string;
+    firstIncompleteTaskRef: RefObject<HTMLLIElement | null>;
 }
 
-const TodoList = ({ styles }: TodoListProps) => {
+const TodoList = (props: TodoListProps) => {
     const {
+        styles,
         tasks,
-        filteredTasks,
-    } = useTasksContext();
+        hasAnyTasks,
+        query,
+        firstIncompleteTaskId,
+        firstIncompleteTaskRef,
+    } = props;
 
-    const hasTask = tasks.length > 0;
-    const isEmptyFilteredTasks = filteredTasks?.length <= 0;
-
-    if (!hasTask) {
+    if (!hasAnyTasks) {
         return <div className={styles.emptyMessage}>No tasks</div>;
-    } else if (isEmptyFilteredTasks) {
+    } else if (tasks.length === 0) {
         return <div className={styles.emptyMessage}>Not found</div>;
     }
 
     return (
         <ul className={styles.list}>
-            {(filteredTasks ?? tasks).map(({ id, isDone, title }) => (
+            {tasks.map(({ id, isDone, title }) => (
                 <TodoItem 
                     id={id}
                     isDone={isDone}
                     title={title}
                     key={id}
+                    query={query}
+                    ref={id === firstIncompleteTaskId ? firstIncompleteTaskRef : null}
                 />
             ))}
         </ul>

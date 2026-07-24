@@ -11,7 +11,6 @@ const App = () => {
         <Route path="/" element={<TasksPage />} />
         <Route path="/tasks/:id" element={<TaskPage />} />
         <Route path="*" element={<div>404 - Page Not Found</div>} />
-
       </Routes>
     </BrowserRouter>
   );

@@ -1,16 +1,12 @@
 import Field from "@/shared/ui/Field";
-import { useTasksContext } from "@/entities/todo/model/useTasksContext";
 
 type SearchTaskFormProps = {
     styles: CSSModuleClasses;
+    query: string;
+    onQueryChange: (query: string) => void;
 }
 
-const SearchTaskForm = ({ styles }: SearchTaskFormProps) => {
-    const {
-        query,
-        setQuery,
-    } = useTasksContext();
-
+const SearchTaskForm = ({ styles, query, onQueryChange }: SearchTaskFormProps) => {
     return (
         <form 
             className={styles.form}
@@ -22,7 +18,7 @@ const SearchTaskForm = ({ styles }: SearchTaskFormProps) => {
                 type="search"
                 label="Search task"
                 value={query}
-                onInput={(event) => setQuery(event.currentTarget.value)}
+                onInput={(event) => onQueryChange(event.currentTarget.value)}
             />
         </form>
     );

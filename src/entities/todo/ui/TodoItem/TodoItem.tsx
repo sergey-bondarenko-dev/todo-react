@@ -1,15 +1,17 @@
 import clsx from "clsx";
-import { memo } from "react";
+import { memo, type Ref } from "react";
 import { highlightCaseInsensitive } from "@/shared/utils/highlight";
-import { useTasksContext } from "../../model/useTasksContext";
 import styles from './TodoItem.module.scss';
 import { Link } from "react-router-dom";
+import { useDeleteTaskMutation, useToggleCompleteTaskMutation } from "../../api";
 
 type TodoItemProps = {
   className?: string,
   id: string,
   title: string,
   isDone: boolean;
+  query: string;
+  ref?: Ref<HTMLLIElement>;
 }
 
 const TodoItem = (props: TodoItemProps) => {
@@ -18,17 +20,12 @@ const TodoItem = (props: TodoItemProps) => {
     id,
     title,
     isDone,
+    query,
+    ref,
   } = props;
 
-  const {
-    deleteTask,
-    toggleTaskComplete,
-    firstIncompleteTaskId,
-    firstIncompleteTaskRef,
-    disappearingTaskId,
-    appearingTaskId,
-    query,
-  } = useTasksContext();
+  const [deleteTask] = useDeleteTaskMutation();
+  const [toggleComplete] = useToggleCompleteTaskMutation();
 
   const highlightedTitle = highlightCaseInsensitive(title, query);
 
@@ -37,10 +34,8 @@ const TodoItem = (props: TodoItemProps) => {
         className={clsx(
           styles.root, 
           className, 
-          disappearingTaskId === id ? styles.isDisappearing : '',
-          appearingTaskId === id ? styles.isAppearing : '',
         )}
-        ref={id === firstIncompleteTaskId ? firstIncompleteTaskRef : null}
+        ref={ref}
       >
         <input
           className={styles.checkbox}
@@ -48,7 +43,7 @@ const TodoItem = (props: TodoItemProps) => {
           type="checkbox"
           checked={isDone}
           onChange={(event) => {
-            toggleTaskComplete(id, event.target.checked)
+            toggleComplete({ id, isDone: event.target.checked });
           }}
         />
         <label
