@@ -1,30 +1,33 @@
 import Field from "@/shared/ui/Field";
 import Button from "@/shared/ui/Button";
-import { useState, type InputEvent, type SubmitEvent } from "react";
-import { useTasksContext } from "@/entities/todo/model/useTasksContext";
+import { useEffect, useRef, useState, type InputEvent, type SubmitEvent } from "react";
+import { useAddTaskMutation } from "@/entities/todo/api";
 
 type AddTaskFormProps = {
-    styles: CSSModuleClasses
+    styles: CSSModuleClasses;
+    onTaskAdded: () => void;
 }
 
-const AddTaskForm = ({ styles }: AddTaskFormProps) => {
+const AddTaskForm = ({ styles, onTaskAdded }: AddTaskFormProps) => {
     const [newTaskTitle, setNewTaskTitle] = useState('');
-
-    const {
-        addTask,
-        newTaskTitleInputRef,
-    } = useTasksContext();
-
     const [error, setError] = useState('');
+    const [add] = useAddTaskMutation();
+    const newTaskTitleInputRef = useRef<HTMLInputElement>(null);
 
     const clearTitle = newTaskTitle.trim();
     const isTitleEmpty = clearTitle.length === 0;
+    useEffect(() => {
+        newTaskTitleInputRef.current?.focus();
+    }, []);
 
-    const onSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!isTitleEmpty) {
-            addTask(clearTitle, () => setNewTaskTitle(''));
+            await add(clearTitle).unwrap();
+            setNewTaskTitle('');
+            onTaskAdded();
+            newTaskTitleInputRef.current?.focus();
         }
     }
 
