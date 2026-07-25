@@ -17,12 +17,12 @@
 }
 
 .input {
-  --fieldInputPaddingX: 16px;
-  --fieldSeachInputIconSize: 16px;
+  --field-input-padding-x: 16px;
+  --field-search-input-icon-size: 16px;
 
   width: 100%;
   height: var(--input-height);
-  padding-inline: var(--fieldInputPaddingX);
+  padding-inline: var(--field-input-padding-x);
   background-color: transparent;
   border: var(--border);
   border-radius: var(--border-radius);
@@ -39,10 +39,10 @@
 
   &[type="search"] {
     &:placeholder-shown {
-      padding-right: calc(var(--fieldInputPaddingX) * 2 + var(--fieldSeachInputIconSize));
+      padding-right: calc(var(--field-input-padding-x) * 2 + var(--field-search-input-icon-size));
       background-image: url('@/shared/assets/icons/icon-search_black.svg');
-      background-position: calc(100% - var(--fieldInputPaddingX)) 50%;
-      background-size: var(--fieldSeachInputIconSize);
+      background-position: calc(100% - var(--field-input-padding-x)) 50%;
+      background-size: var(--field-search-input-icon-size);
       background-repeat: no-repeat;
     }
   }

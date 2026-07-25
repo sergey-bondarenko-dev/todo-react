@@ -54,10 +54,10 @@
 }
 
 .list {
-  --todoListRowGap: 8px;
+  --todo-list-row-gap: 8px;
 
   display: grid;
-  row-gap: var(--todoListRowGap);
+  row-gap: var(--todo-list-row-gap);
 }
 
 .emptyMessage {
