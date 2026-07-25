@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { memo, type Ref } from "react";
 import { highlightCaseInsensitive } from "@/shared/utils/highlight";
 import styles from './TodoItem.module.scss';
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useDeleteTaskMutation, useToggleCompleteTaskMutation } from "../../api";
 
 type TodoItemProps = {

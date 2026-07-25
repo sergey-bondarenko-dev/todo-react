@@ -1,6 +1,6 @@
 import TaskPage from "@/pages/TaskPage";
 import TasksPage from "@/pages/TasksPage";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router";
 import { BASE_URL } from "@/shared/constants";
 import './styles';
 
