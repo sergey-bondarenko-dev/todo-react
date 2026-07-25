@@ -1,6 +1,10 @@
 import { memo, type RefObject } from "react";
+import { AnimatePresence, LazyMotion } from "motion/react";
 import type { Task } from "@/shared/api/tasks/type";
 import TodoItem from "../TodoItem";
+
+const loadMotionFeatures = () =>
+    import("./motionFeatures").then(({ default: features }) => features);
 
 type TodoListProps = {
     styles: CSSModuleClasses;
@@ -21,25 +25,31 @@ const TodoList = (props: TodoListProps) => {
         firstIncompleteTaskRef,
     } = props;
 
-    if (!hasAnyTasks) {
-        return <div className={styles.emptyMessage}>No tasks</div>;
-    } else if (tasks.length === 0) {
-        return <div className={styles.emptyMessage}>Not found</div>;
-    }
-
     return (
-        <ul className={styles.list}>
-            {tasks.map(({ id, isDone, title }) => (
-                <TodoItem 
-                    id={id}
-                    isDone={isDone}
-                    title={title}
-                    key={id}
-                    query={query}
-                    ref={id === firstIncompleteTaskId ? firstIncompleteTaskRef : null}
-                />
-            ))}
-        </ul>
+        <>
+            {!hasAnyTasks && (
+                <div className={styles.emptyMessage}>No tasks</div>
+            )}
+            {hasAnyTasks && tasks.length === 0 && (
+                <div className={styles.emptyMessage}>Not found</div>
+            )}
+            <ul className={styles.list}>
+                <LazyMotion features={loadMotionFeatures} strict>
+                    <AnimatePresence initial={false}>
+                        {tasks.map(({ id, isDone, title }) => (
+                            <TodoItem
+                                id={id}
+                                isDone={isDone}
+                                title={title}
+                                key={id}
+                                query={query}
+                                ref={id === firstIncompleteTaskId ? firstIncompleteTaskRef : null}
+                            />
+                        ))}
+                    </AnimatePresence>
+                </LazyMotion>
+            </ul>
+        </>
     );
 }
 

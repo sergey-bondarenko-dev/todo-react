@@ -1,5 +1,7 @@
 import clsx from "clsx";
 import { memo, type Ref } from "react";
+import { useReducedMotion } from "motion/react";
+import * as m from "motion/react-m";
 import { highlightCaseInsensitive } from "@/shared/utils/highlight";
 import styles from './TodoItem.module.scss';
 import { Link } from "react-router";
@@ -24,18 +26,26 @@ const TodoItem = (props: TodoItemProps) => {
     ref,
   } = props;
 
-  const [deleteTask] = useDeleteTaskMutation();
+  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
   const [toggleComplete] = useToggleCompleteTaskMutation();
+  const shouldReduceMotion = useReducedMotion();
 
   const highlightedTitle = highlightCaseInsensitive(title, query);
 
   return (
-      <li 
+      <m.li
         className={clsx(
           styles.root, 
           className, 
         )}
         ref={ref}
+        initial={shouldReduceMotion ? false : { opacity: 0, height: 0, y: -12 }}
+        animate={{ opacity: 1, height: "auto", x: 0, y: 0 }}
+        exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0, x: 24 }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 0.2,
+          ease: "easeOut",
+        }}
       >
         <input
           className={styles.checkbox}
@@ -62,6 +72,8 @@ const TodoItem = (props: TodoItemProps) => {
           className={styles.deleteButton}
           aria-label="Delete"
           title="Delete"
+          disabled={isDeleting}
+          aria-busy={isDeleting}
           onClick={() => deleteTask(id)}
         >
           <svg
@@ -80,7 +92,7 @@ const TodoItem = (props: TodoItemProps) => {
             />
           </svg>
         </button>
-      </li>
+      </m.li>
   );
 }
 
