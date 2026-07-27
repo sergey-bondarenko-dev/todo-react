@@ -6,6 +6,8 @@ import { highlightCaseInsensitive } from "@/shared/utils/highlight";
 import styles from './TodoItem.module.scss';
 import { Link } from "react-router";
 import { useDeleteTaskMutation, useToggleCompleteTaskMutation } from "../../api";
+import { getTasksErrorMessage } from "../../lib/getTasksErrorMessage";
+import { toast } from "sonner";
 
 type TodoItemProps = {
   className?: string,
@@ -26,11 +28,46 @@ const TodoItem = (props: TodoItemProps) => {
     ref,
   } = props;
 
-  const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
-  const [toggleComplete] = useToggleCompleteTaskMutation();
+  const [
+    deleteTask,
+    { isLoading: isDeleting },
+  ] = useDeleteTaskMutation();
+  const [
+    toggleComplete,
+    { isLoading: isToggling },
+  ] = useToggleCompleteTaskMutation();
   const shouldReduceMotion = useReducedMotion();
 
   const highlightedTitle = highlightCaseInsensitive(title, query);
+
+  const deleteCurrentTask = async () => {
+      try {
+          await deleteTask(id).unwrap();
+      } catch (error) {
+          toast.error(
+              getTasksErrorMessage(
+                  error,
+                  'Failed to delete task',
+              ),
+          );
+      }
+  };
+
+  const toggleCurrentTask = async (nextIsDone: boolean) => {
+      try {
+          await toggleComplete({
+              id,
+              isDone: nextIsDone,
+          }).unwrap();
+      } catch (error) {
+          toast.error(
+              getTasksErrorMessage(
+                  error,
+                  'Failed to update task',
+              ),
+          );
+      }
+  };
 
   return (
       <m.li
@@ -53,8 +90,10 @@ const TodoItem = (props: TodoItemProps) => {
           type="checkbox"
           checked={isDone}
           onChange={(event) => {
-            toggleComplete({ id, isDone: event.target.checked });
+              void toggleCurrentTask(event.currentTarget.checked);
           }}
+          disabled={isDeleting || isToggling}
+          aria-busy={isToggling}
         />
         <label
           className={clsx(styles.label, 'visually-hidden')}
@@ -72,9 +111,9 @@ const TodoItem = (props: TodoItemProps) => {
           className={styles.deleteButton}
           aria-label="Delete"
           title="Delete"
-          disabled={isDeleting}
+          disabled={isDeleting || isToggling}
           aria-busy={isDeleting}
-          onClick={() => deleteTask(id)}
+          onClick={() => void deleteCurrentTask()}
         >
           <svg
             width="20"

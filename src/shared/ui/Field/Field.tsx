@@ -19,6 +19,7 @@ const Field = (props: FieldProps) => {
         value,
         ref,
         error,
+        disabled,
     } = props;
     
     return (
@@ -38,6 +39,7 @@ const Field = (props: FieldProps) => {
                 value={value}
                 onInput={onInput}
                 ref={ref}
+                disabled={disabled}
             />
             {error && (
                 <span className={styles.error} title={error}>

@@ -1,10 +1,11 @@
 import taskRepository from "@/shared/api/tasks";
 import type { Task } from "@/shared/api/tasks/type";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+import { normalizeTasksApiError, type TasksApiError } from "./error";
 
 export const tasksApi = createApi({
     reducerPath: "tasksApi",
-    baseQuery: fakeBaseQuery(),
+    baseQuery: fakeBaseQuery<TasksApiError>(),
     tagTypes: ["Task"],
 
     endpoints: (builder) => ({
@@ -15,7 +16,9 @@ export const tasksApi = createApi({
 
                     return { data: tasks };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             providesTags: (result) =>
@@ -33,7 +36,9 @@ export const tasksApi = createApi({
 
                     return { data: task };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             providesTags: (_result, _error, id) => [{ type: "Task", id }],
@@ -45,10 +50,15 @@ export const tasksApi = createApi({
 
                     return { data };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
-            invalidatesTags: [{ type: "Task", id: "LIST" }],
+            invalidatesTags: (_result, error) =>
+                error
+                    ? []
+                    : [{ type: "Task", id: "LIST" }],
         }),
         deleteTask: builder.mutation<void, string>({
             queryFn: async (id) => {
@@ -57,13 +67,18 @@ export const tasksApi = createApi({
 
                     return { data: undefined };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
-            invalidatesTags: (_result, _error, id) => [
-                { type: "Task", id },
-                { type: "Task", id: "LIST" },
-            ],
+            invalidatesTags: (_result, error, id) =>
+                error
+                    ? []
+                    : [
+                        { type: "Task", id },
+                        { type: "Task", id: "LIST" },
+                    ],
         }),
         deleteAllTasks: builder.mutation<void, Task[]>({
             queryFn: async (tasks) => {
@@ -72,15 +87,20 @@ export const tasksApi = createApi({
 
                     return { data: undefined };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
-            invalidatesTags: (_result, _error, tasks) => [
-                { type: "Task", id: "LIST" },
-                ...(tasks
-                    ? tasks.map(({ id }) => ({ type: "Task" as const, id }))
-                    : []),
-            ],
+            invalidatesTags: (_result, error, tasks) => (
+                error 
+                    ? []
+                    : [
+                        { type: "Task", id: "LIST" },
+                        ...(tasks
+                            ? tasks.map(({ id }) => ({ type: "Task" as const, id }))
+                            : []),
+                    ]),
         }),
         toggleCompleteTask: builder.mutation<void, { id: string, isDone: boolean }>({
             queryFn: async ({ id, isDone }) => {
@@ -89,12 +109,17 @@ export const tasksApi = createApi({
 
                     return { data: undefined };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
-            invalidatesTags: (_result, _error, { id }) => [
-                { type: "Task", id },
-            ],
+            invalidatesTags: (_result, error, { id }) => (
+                error 
+                    ? []
+                    : [
+                        { type: "Task", id },
+                    ]),
         }),
     })
 });

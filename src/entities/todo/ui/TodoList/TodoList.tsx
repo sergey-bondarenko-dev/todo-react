@@ -33,6 +33,7 @@ const TodoList = (props: TodoListProps) => {
             {hasAnyTasks && tasks.length === 0 && (
                 <div className={styles.emptyMessage}>Not found</div>
             )}
+            
             <ul className={styles.list}>
                 <LazyMotion features={loadMotionFeatures} strict>
                     <AnimatePresence initial={false}>
