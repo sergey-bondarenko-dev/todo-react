@@ -13,6 +13,7 @@ type TodoListProps = {
     query: string;
     firstIncompleteTaskId?: string;
     firstIncompleteTaskRef: RefObject<HTMLLIElement | null>;
+    isLoading?: boolean;
 }
 
 const TodoList = (props: TodoListProps) => {
@@ -23,16 +24,21 @@ const TodoList = (props: TodoListProps) => {
         query,
         firstIncompleteTaskId,
         firstIncompleteTaskRef,
+        isLoading = false,
     } = props;
 
     return (
         <>
-            {!hasAnyTasks && (
+            {isLoading && (
+                <div className={styles.emptyMessage} role="status">Loading...</div>
+            )}
+            {!isLoading && !hasAnyTasks && (
                 <div className={styles.emptyMessage}>No tasks</div>
             )}
-            {hasAnyTasks && tasks.length === 0 && (
+            {!isLoading && hasAnyTasks && tasks.length === 0 && (
                 <div className={styles.emptyMessage}>Not found</div>
             )}
+            
             <ul className={styles.list}>
                 <LazyMotion features={loadMotionFeatures} strict>
                     <AnimatePresence initial={false}>

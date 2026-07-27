@@ -6,9 +6,10 @@ import { TodoList } from "@/entities/todo";
 import { useGetTasksQuery } from "@/entities/todo/api";
 import Button from "@/shared/ui/Button";
 import styles from './Todo.module.scss';
+import Skeleton from "@/shared/ui/Skeleton";
 
 const Todo = () => {
-    const { data: tasks = [] } = useGetTasksQuery();
+    const { data: tasks = [], isLoading } = useGetTasksQuery();
     const [query, setQuery] = useState('');
     const firstIncompleteTaskRef = useRef<HTMLLIElement>(null);
 
@@ -41,8 +42,14 @@ const Todo = () => {
                 query={query}
                 onQueryChange={setQuery}
             />
-            <TodoInfo styles={styles} tasks={tasks} />
-            <Button onClick={scrollToFirstIncompleteTask}>
+
+            {isLoading ? (
+                <Skeleton className={styles.todoInfoSkeleton} />
+            ) : (
+                <TodoInfo styles={styles} tasks={tasks} />
+            )}
+            
+            <Button onClick={scrollToFirstIncompleteTask} disabled={!firstIncompleteTaskId}>
                 Show first incomplete task
             </Button>
             <TodoList
@@ -52,6 +59,7 @@ const Todo = () => {
                 query={query}
                 firstIncompleteTaskId={firstIncompleteTaskId}
                 firstIncompleteTaskRef={firstIncompleteTaskRef}
+                isLoading={isLoading}
             />
         </div>
     );
