@@ -2,6 +2,8 @@ import Field from "@/shared/ui/Field";
 import Button from "@/shared/ui/Button";
 import { useEffect, useRef, useState, type InputEvent, type SubmitEvent } from "react";
 import { useAddTaskMutation } from "@/entities/todo/api";
+import { getTasksErrorMessage } from "@/entities/todo";
+import { toast } from "sonner";
 
 type AddTaskFormProps = {
     styles: CSSModuleClasses;
@@ -10,8 +12,11 @@ type AddTaskFormProps = {
 
 const AddTaskForm = ({ styles, onTaskAdded }: AddTaskFormProps) => {
     const [newTaskTitle, setNewTaskTitle] = useState('');
-    const [error, setError] = useState('');
-    const [add] = useAddTaskMutation();
+    const [validationError, setValidationError] = useState('');
+    const [
+        add,
+        { isLoading: isAdding },
+    ] = useAddTaskMutation();
     const newTaskTitleInputRef = useRef<HTMLInputElement>(null);
 
     const clearTitle = newTaskTitle.trim();
@@ -23,12 +28,22 @@ const AddTaskForm = ({ styles, onTaskAdded }: AddTaskFormProps) => {
     const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!isTitleEmpty) {
+        if (isTitleEmpty || isAdding) {
+            return;
+        }
+
+        try {
             await add(clearTitle).unwrap();
+
             setNewTaskTitle('');
             onTaskAdded();
             newTaskTitleInputRef.current?.focus();
+        } catch (error) {
+            toast.error(
+                getTasksErrorMessage(error, 'Failed to add task'),
+            );
         }
+        
     }
 
     const onInput = (event: InputEvent<HTMLInputElement>) => {
@@ -37,7 +52,7 @@ const AddTaskForm = ({ styles, onTaskAdded }: AddTaskFormProps) => {
         const hasOnlySpaces = clearValue.length === 0 && value.length > 0;
 
         setNewTaskTitle(value);
-        setError(hasOnlySpaces ? 'Title cannot be empty' : '');
+        setValidationError(hasOnlySpaces ? 'Title cannot be empty' : '');
     }
 
     return (
@@ -50,13 +65,15 @@ const AddTaskForm = ({ styles, onTaskAdded }: AddTaskFormProps) => {
                 value={newTaskTitle}
                 onInput={onInput}
                 ref={newTaskTitleInputRef}
-                error={error}
+                error={validationError}
+                disabled={isAdding}
             />
             <Button 
                 type="submit"
-                disabled={isTitleEmpty}
+                className={styles.addButton}
+                disabled={isTitleEmpty || isAdding}
             >
-                Add
+                {isAdding ? 'Adding...' : 'Add'}
             </Button>
         </form>
     );

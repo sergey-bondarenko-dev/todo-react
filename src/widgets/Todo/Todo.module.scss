@@ -24,6 +24,10 @@
   column-gap: 16px;
 }
 
+.addButton {
+  min-width: 100px;
+}
+
 .field {
   width: 100%;
 }
@@ -70,4 +74,75 @@
 
 .todoInfoSkeleton {
   height: 24px;
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background-color: rgb(0 0 0 / 45%);
+}
+
+.dialogContent {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 101;
+  display: grid;
+  row-gap: 16px;
+  width: min(400px, calc(100vw - 32px));
+  padding: 24px;
+  background-color: var(--color-white);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  translate: -50% -50%;
+}
+
+.dialogTitle {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.dialogDescription {
+  color: var(--color-gray-4);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 12px;
+}
+
+.dialogCancelButton,
+.dialogConfirmButton {
+  min-height: var(--input-height);
+  padding-inline: 16px;
+  border-radius: var(--border-radius);
+
+  &:active {
+    scale: 1.05;
+  }
+}
+
+.dialogCancelButton {
+  color: var(--color-dark-2);
+  background-color: transparent;
+  border: var(--border);
+
+  &:hover {
+    border-color: var(--color-dark-2);
+  }
+}
+
+.dialogConfirmButton {
+  color: var(--color-white);
+  background-color: var(--color-dark-2);
+  border: 1px solid var(--color-dark-2);
+
+  &:hover {
+    color: var(--color-dark-2);
+    background-color: transparent;
+  }
 }

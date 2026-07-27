@@ -49,3 +49,30 @@ export const normalizeTasksApiError = (
         message: 'Unknown error',
     };
 };
+
+export const isTasksApiError = (
+    error: unknown,
+): error is TasksApiError => {
+    if (
+        typeof error !== 'object'
+        || error === null
+        || !('type' in error)
+        || !('message' in error)
+        || typeof error.message !== 'string'
+    ) {
+        return false;
+    }
+
+    if (error.type === 'http') {
+        return (
+            'status' in error
+            && typeof error.status === 'number'
+        );
+    }
+
+    return (
+        error.type === 'network'
+        || error.type === 'invalid-response'
+        || error.type === 'unknown'
+    );
+};

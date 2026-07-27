@@ -2,17 +2,11 @@ import { useMemo, useRef, useState } from "react";
 import AddTaskForm from "@/features/add-task";
 import SearchTaskForm from "@/features/search-task";
 import TodoInfo from "@/features/stats";
-import { TodoList } from "@/entities/todo";
-import { useGetTasksQuery, type TasksApiError } from "@/entities/todo/api";
+import { getTasksErrorMessage, TodoList } from "@/entities/todo";
+import { useGetTasksQuery } from "@/entities/todo/api";
 import Button from "@/shared/ui/Button";
 import Skeleton from "@/shared/ui/Skeleton";
 import styles from './Todo.module.scss';
-import type { SerializedError } from "@reduxjs/toolkit";
-
-type QueryError =
-    | TasksApiError
-    | SerializedError
-    | undefined;
 
 const Todo = () => {
     const { data, error, isError, isFetching, refetch } = useGetTasksQuery();
@@ -76,7 +70,7 @@ const Todo = () => {
             {hasBackgroundError && (
                 <div className={styles.emptyMessage} role="status">
                     <p>
-                        {getTasksErrorMessage(error)}. Showing previously loaded tasks.
+                        {getTasksErrorMessage(error, 'Failed to load tasks')}. Showing previously loaded tasks.
                     </p>
 
                     <Button onClick={() => void refetch()}>
@@ -91,7 +85,7 @@ const Todo = () => {
                 </div>
             ) : hasInitialError ? (
                 <div className={styles.emptyMessage} role="alert">
-                    <p>{getTasksErrorMessage(error)}</p>
+                    <p>{getTasksErrorMessage(error, 'Failed to load tasks')}</p>
 
                     <Button onClick={() => void refetch()}>
                         Retry
@@ -112,34 +106,3 @@ const Todo = () => {
 }
 
 export default Todo;
-
-const isTasksApiError = (
-    error: QueryError,
-): error is TasksApiError => {
-    return error !== undefined && 'type' in error;
-};
-
-const getTasksErrorMessage = (
-    error: QueryError,
-) => {
-    if (!isTasksApiError(error)) {
-        return 'Something went wrong';
-    }
-
-    switch (error.type) {
-        case 'network':
-            return 'Unable to connect to the server';
-
-        case 'invalid-response':
-            return 'The server returned an invalid response';
-
-        case 'http':
-            return error.status >= 500
-                ? 'The server is temporarily unavailable'
-                : 'Failed to load tasks';
-
-        case 'unknown':
-        default:
-            return 'Something went wrong';
-    }
-};
