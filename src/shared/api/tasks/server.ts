@@ -1,4 +1,6 @@
-import type { TasksApi } from "./type";
+import { requestJson, requestVoid } from "@/shared/utils/request";
+import type { Task, TasksApi } from "./type";
+import { HttpError } from "@/shared/errors/HttpError";
 
 const URL = 'http://localhost:3001/tasks';
 const headers = {
@@ -7,15 +9,21 @@ const headers = {
 
 const serverApi: TasksApi = {
     getAll: () => {
-        return fetch(URL)
-            .then((response) => response.json());
+        return requestJson<Task[]>(URL);
     },
-    getById: (taskId) => {
-        return fetch(`${URL}/${taskId}`)
-            .then((response) => response.json());
+    getById: async (taskId) => {
+        try {
+            return await requestJson<Task>(`${URL}/${taskId}`);
+        } catch (error) {
+            if (error instanceof HttpError && error.status === 404) {
+                return null;
+            }
+
+            throw error;
+        }
     },
     delete: async (taskId) => {
-        await fetch(`${URL}/${taskId}`, {
+        return requestVoid(`${URL}/${taskId}`, {
             method: 'DELETE',
         });
     },
@@ -25,25 +33,21 @@ const serverApi: TasksApi = {
         }));
     },
     toggleComplete: (taskId, isDone) => {
-        return fetch(`${URL}/${taskId}`, {
+        return requestVoid(`${URL}/${taskId}`, {
             method: 'PATCH',
             headers,
             body: JSON.stringify({ isDone }),
-        })
-        .then((response) => response.json());
+        });
     },
     add: (title) => {
-        const newTask = {
-            title,
-            isDone: false,
-        };
-
-        return fetch(URL, {
+        return requestJson<Task>(URL, {
             method: 'POST',
             headers,
-            body: JSON.stringify(newTask),
-        })
-        .then((response) => response.json());
+            body: JSON.stringify({
+                title,
+                isDone: false,
+            }),
+        });
     },
 };
 

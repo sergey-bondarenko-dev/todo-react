@@ -6,3 +6,5 @@ export {
     useDeleteAllTasksMutation,
     useToggleCompleteTaskMutation,
 } from "./tasksApi";
+
+export type { TasksApiError } from './error';

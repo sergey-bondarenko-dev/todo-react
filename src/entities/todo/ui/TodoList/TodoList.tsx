@@ -13,7 +13,6 @@ type TodoListProps = {
     query: string;
     firstIncompleteTaskId?: string;
     firstIncompleteTaskRef: RefObject<HTMLLIElement | null>;
-    isLoading?: boolean;
 }
 
 const TodoList = (props: TodoListProps) => {
@@ -24,18 +23,14 @@ const TodoList = (props: TodoListProps) => {
         query,
         firstIncompleteTaskId,
         firstIncompleteTaskRef,
-        isLoading = false,
     } = props;
 
     return (
         <>
-            {isLoading && (
-                <div className={styles.emptyMessage} role="status">Loading...</div>
-            )}
-            {!isLoading && !hasAnyTasks && (
+            {!hasAnyTasks && (
                 <div className={styles.emptyMessage}>No tasks</div>
             )}
-            {!isLoading && hasAnyTasks && tasks.length === 0 && (
+            {hasAnyTasks && tasks.length === 0 && (
                 <div className={styles.emptyMessage}>Not found</div>
             )}
             

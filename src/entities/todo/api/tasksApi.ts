@@ -1,10 +1,11 @@
 import taskRepository from "@/shared/api/tasks";
 import type { Task } from "@/shared/api/tasks/type";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+import { normalizeTasksApiError, type TasksApiError } from "./error";
 
 export const tasksApi = createApi({
     reducerPath: "tasksApi",
-    baseQuery: fakeBaseQuery(),
+    baseQuery: fakeBaseQuery<TasksApiError>(),
     tagTypes: ["Task"],
 
     endpoints: (builder) => ({
@@ -15,7 +16,9 @@ export const tasksApi = createApi({
 
                     return { data: tasks };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             providesTags: (result) =>
@@ -33,7 +36,9 @@ export const tasksApi = createApi({
 
                     return { data: task };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             providesTags: (_result, _error, id) => [{ type: "Task", id }],
@@ -45,7 +50,9 @@ export const tasksApi = createApi({
 
                     return { data };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             invalidatesTags: [{ type: "Task", id: "LIST" }],
@@ -57,7 +64,9 @@ export const tasksApi = createApi({
 
                     return { data: undefined };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             invalidatesTags: (_result, _error, id) => [
@@ -72,7 +81,9 @@ export const tasksApi = createApi({
 
                     return { data: undefined };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             invalidatesTags: (_result, _error, tasks) => [
@@ -89,7 +100,9 @@ export const tasksApi = createApi({
 
                     return { data: undefined };
                 } catch (error) {
-                    return { error };
+                    return {
+                        error: normalizeTasksApiError(error),
+                    };
                 }
             },
             invalidatesTags: (_result, _error, { id }) => [

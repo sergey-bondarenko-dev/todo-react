@@ -48,6 +48,9 @@
 
 .list,
 .emptyMessage {
+  display: grid;
+  gap: 12px;
+
   &:empty {
     display: none;
   }
