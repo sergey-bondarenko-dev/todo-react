@@ -1,18 +1,9 @@
-import { configureStore } from "@reduxjs/toolkit";
 import { HttpResponse, http, type JsonBodyType } from 'msw';
 import { describe, expect, it } from "vitest";
 import { tasksApi } from "./tasksApi";
 import { server } from "@/test/mocks/server";
+import { createTestStore } from '@/test/store';
 import type { Task } from "@/shared/api/tasks/type";
-
-const createTestStore = () => configureStore({
-  reducer: {
-    [tasksApi.reducerPath]: tasksApi.reducer,
-  },
-  middleware: (getDefaultMiddleware) => (
-    getDefaultMiddleware().concat(tasksApi.middleware)
-  ),
-});
 
 const setupGetTasksHandler = (resolver: () => HttpResponse<JsonBodyType>) => {
   server.use(
