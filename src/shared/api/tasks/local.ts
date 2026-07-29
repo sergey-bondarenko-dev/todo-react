@@ -4,7 +4,13 @@ const STORAGE_KEY = 'tasks';
 
 const read = (): Task[] => {
     try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const parsedData: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+        if (!Array.isArray(parsedData)) {
+            return [];
+        }
+
+        return parsedData.filter(isTask);
     } catch {
         return [];
     }
@@ -55,5 +61,12 @@ const localAPI: TasksApi = {
         return newTask;
     },
 };
+
+const isTask = (value: unknown): value is Task => {
+    return typeof value === 'object' && value !== null &&
+        'id' in value && typeof value.id === 'string' &&
+        'title' in value && typeof value.title === 'string' &&
+        'isDone' in value && typeof value.isDone === 'boolean';
+}
 
 export default localAPI;
