@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -24,6 +26,14 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
+    },
+    test: {
+      setupFiles: './src/test/setup.ts',
+      environmentOptions: {
+        jsdom: {
+          url: 'http://localhost/',
+        }
+      }
     },
   }
 })
