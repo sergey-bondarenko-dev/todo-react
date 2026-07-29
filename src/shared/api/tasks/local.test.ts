@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import localAPI from "./local";
+import type { Task } from "./type";
 
 const jsdomInstance = (
   globalThis as typeof globalThis & {
@@ -28,17 +29,30 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+const createTasks = (): Task[] => [
+  {
+    id: '1',
+    title: 'Buy milk',
+    isDone: false,
+  },
+  {
+    id: '2',
+    title: 'Learn React',
+    isDone: false,
+  },
+];
+
+const storeTasks = (tasks: Task[]) => {
+  window.localStorage.setItem(
+    'tasks',
+    JSON.stringify(tasks),
+  );
+};
+
 describe('local', () => {
   it('returns tasks stored in localStorage', async () => {
-    const tasks = [
-      {
-        id: '1',
-        title: 'Buy milk',
-        isDone: false,
-      },
-    ];
-
-    window.localStorage.setItem('tasks', JSON.stringify(tasks));
+    const tasks = createTasks();
+    storeTasks(tasks);
 
     const result = await runWithFakeTimers(() => localAPI.getAll());
 
@@ -100,6 +114,84 @@ describe('local', () => {
     );
 
     expect(result).toEqual([validTask]);
+  });
+
+  it('updates completion state only for the selected task', async () => {
+    const tasks = createTasks();
+    storeTasks(tasks);
+
+    await runWithFakeTimers(
+      () => localAPI.toggleComplete('1', true),
+    );
+
+    const result = await runWithFakeTimers(
+      () => localAPI.getAll(),
+    );
+
+    expect(result).toEqual([
+      {
+        id: '1',
+        title: 'Buy milk',
+        isDone: true,
+      },
+      {
+        id: '2',
+        title: 'Learn React',
+        isDone: false,
+      },
+    ]);
+  });
+
+  it('deletes only the selected task', async () => {
+    const tasks = createTasks();
+    storeTasks(tasks);
+
+    await runWithFakeTimers(
+      () => localAPI.delete('1'),
+    );
+
+    const result = await runWithFakeTimers(
+      () => localAPI.getAll(),
+    );
+
+    expect(result).toEqual([
+      {
+        id: '2',
+        title: 'Learn React',
+        isDone: false,
+      },
+    ]);
+  });
+
+  it('deletes all tasks', async () => {
+    const tasks = createTasks();
+    storeTasks(tasks);
+
+    await runWithFakeTimers(
+      () => localAPI.deleteAll(tasks),
+    );
+
+    const result = await runWithFakeTimers(
+      () => localAPI.getAll(),
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it('returns a task by id or null when it does not exist', async () => {
+    const tasks = createTasks();
+    storeTasks(tasks);
+
+    const existingTask = await runWithFakeTimers(
+      () => localAPI.getById('2'),
+    );
+
+    const missingTask = await runWithFakeTimers(
+      () => localAPI.getById('missing'),
+    );
+
+    expect(existingTask).toEqual(tasks[1]);
+    expect(missingTask).toBeNull();
   });
 });
 
