@@ -67,6 +67,14 @@ describe('local', () => {
     expect(result).toEqual([]);
   });
 
+  it('returns empty array when localStorage contains object', async () => {
+    window.localStorage.setItem('tasks', JSON.stringify({}));
+
+    const result = await runWithFakeTimers(() => localAPI.getAll());
+
+    expect(result).toEqual([]);
+  });
+
   it('adds a task and persists it', async () => {
     const createdTask = await runWithFakeTimers(() => localAPI.add('Buy milk'));
 

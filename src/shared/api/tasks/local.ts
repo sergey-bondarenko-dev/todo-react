@@ -1,3 +1,4 @@
+import { isTask } from "./isTask";
 import type { Task, TasksApi } from "./type";
 
 const STORAGE_KEY = 'tasks';
@@ -50,7 +51,7 @@ const localAPI: TasksApi = {
     add: async (title) => {
         await delay();
 
-        const newTask = {
+        const newTask: Task = {
             id: crypto?.randomUUID() ?? Date.now().toString(),
             title,
             isDone: false,
@@ -61,12 +62,5 @@ const localAPI: TasksApi = {
         return newTask;
     },
 };
-
-const isTask = (value: unknown): value is Task => {
-    return typeof value === 'object' && value !== null &&
-        'id' in value && typeof value.id === 'string' &&
-        'title' in value && typeof value.title === 'string' &&
-        'isDone' in value && typeof value.isDone === 'boolean';
-}
 
 export default localAPI;

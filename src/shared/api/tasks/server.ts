@@ -1,6 +1,8 @@
 import { requestJson, requestVoid } from "@/shared/utils/request";
-import type { Task, TasksApi } from "./type";
+import type { TasksApi } from "./type";
 import { HttpError } from "@/shared/errors/HttpError";
+import { isTask } from "./isTask";
+import { InvalidResponseError } from "@/shared/errors/InvalidResponseError";
 
 const URL = 'http://localhost:3001/tasks';
 const headers = {
@@ -8,12 +10,28 @@ const headers = {
 };
 
 const serverApi: TasksApi = {
-    getAll: () => {
-        return requestJson<Task[]>(URL);
+    getAll: async () => {
+        const tasks = await requestJson(URL);
+
+        if (!Array.isArray(tasks)) {
+            throw new InvalidResponseError('Received tasks is incorrect');
+        }
+
+        if (!tasks.every(isTask)) {
+            throw new InvalidResponseError('Received tasks is incorrect');
+        }
+
+        return tasks;
     },
     getById: async (taskId) => {
         try {
-            return await requestJson<Task>(`${URL}/${taskId}`);
+            const task = await requestJson(`${URL}/${taskId}`);
+
+            if (isTask(task)) {
+                return task;
+            }
+
+            throw new InvalidResponseError('Received task is incorrect');
         } catch (error) {
             if (error instanceof HttpError && error.status === 404) {
                 return null;
@@ -39,8 +57,8 @@ const serverApi: TasksApi = {
             body: JSON.stringify({ isDone }),
         });
     },
-    add: (title) => {
-        return requestJson<Task>(URL, {
+    add: async (title) => {
+        const task = await requestJson(URL, {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -48,6 +66,12 @@ const serverApi: TasksApi = {
                 isDone: false,
             }),
         });
+
+        if (!isTask(task)) {
+            throw new InvalidResponseError('Received task is incorrect');
+        }
+
+        return task;
     },
 };
 

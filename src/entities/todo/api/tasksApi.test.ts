@@ -106,6 +106,30 @@ describe('tasksApi', () => {
     });
   });
 
+  it('normalizes an invalid tasks response', async () => {
+    const serverTasks = [
+      {
+        id: '1',
+        title: 'Buy milk',
+        isDone: true,
+      },
+      {
+        id: '2',
+        title: 'Learn React',
+        isDone: 'on',
+      },
+    ];
+
+    setupGetTasksHandler(
+      () => HttpResponse.json(serverTasks),
+    );
+
+    await expect(runGetTasksQuery()).rejects.toEqual({
+      type: 'invalid-response',
+      message: 'Server returned an invalid response',
+    });
+  });
+
   it('returns null when a task does not exist', async () => {
     server.use(
       http.get(

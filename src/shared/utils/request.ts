@@ -9,15 +9,15 @@ const ensureSuccessfulResponse = (response: Response) => {
   }
 }
 
-export const requestJson = async <T>(
+export const requestJson = async (
     url: string,
     options?: RequestInit,
-): Promise<T> => {
+): Promise<unknown> => {
     const response = await fetch(url, options);
 
     ensureSuccessfulResponse(response);
 
-    return response.json() as Promise<T>;
+    return response.json();
 }
 
 export const requestVoid = async (

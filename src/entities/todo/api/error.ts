@@ -1,4 +1,5 @@
 import { HttpError } from '@/shared/errors/HttpError';
+import { InvalidResponseError } from '@/shared/errors/InvalidResponseError';
 
 export type TasksApiError =
   | {
@@ -37,7 +38,7 @@ export const normalizeTasksApiError = (
         };
     }
 
-    if (error instanceof SyntaxError) {
+    if (error instanceof SyntaxError || error instanceof InvalidResponseError) {
         return {
             type: 'invalid-response',
             message: 'Server returned an invalid response',
