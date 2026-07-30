@@ -55,10 +55,32 @@ export const tasksApi = createApi({
                     };
                 }
             },
-            invalidatesTags: (_result, error) =>
-                error
-                    ? []
-                    : [{ type: "Task", id: "LIST" }],
+            onQueryStarted: async (
+                _title,
+                { dispatch, queryFulfilled },
+            ) => {
+                try {
+                    const { data: createdTask } = await queryFulfilled;
+
+                    dispatch(
+                        tasksApi.util.updateQueryData(
+                            'getTasks',
+                            undefined,
+                            (draft) => {
+                                const taskExists = draft.some(
+                                    ({ id }) => id === createdTask.id,
+                                );
+
+                                if (!taskExists) {
+                                    draft.push(createdTask);
+                                }
+                            },
+                        ),
+                    );
+                } catch {
+                    return;
+                }
+            },
         }),
         deleteTask: builder.mutation<void, string>({
             queryFn: async (id) => {
@@ -120,6 +142,43 @@ export const tasksApi = createApi({
                     : [
                         { type: "Task", id },
                     ]),
+            onQueryStarted: async (
+                { id, isDone },
+                { dispatch, queryFulfilled },
+            ) => {
+                const getTasksPatchResult = dispatch(
+                    tasksApi.util.updateQueryData(
+                        'getTasks',
+                        undefined,
+                        (draft) => {
+                            const task = draft.find((item) => item.id === id);
+
+                            if (task) {
+                                task.isDone = isDone;
+                            }
+                        },
+                    ),
+                );
+
+                const getTaskByIdPatchResult = dispatch(
+                    tasksApi.util.updateQueryData(
+                        'getTaskById',
+                        id,
+                        (draft) => {
+                            if (draft) {
+                                draft.isDone = isDone;
+                            }
+                        },
+                    ),
+                );
+
+                try {
+                    await queryFulfilled;
+                } catch {
+                    getTasksPatchResult.undo();
+                    getTaskByIdPatchResult.undo();
+                }
+            },
         }),
     })
 });

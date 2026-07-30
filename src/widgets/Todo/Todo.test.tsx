@@ -237,6 +237,12 @@ describe('Todo', () => {
   });
 
   it('toggles task status when a checkbox is clicked', async () => {
+    let finishToggle!: () => void;
+
+    const toggleBarrier = new Promise<void>((resolve) => {
+      finishToggle = resolve;
+    });
+
     let serverTasks = tasks.slice();
 
     server.use(
@@ -248,6 +254,8 @@ describe('Todo', () => {
       http.patch(
         'http://localhost:3001/tasks/:id',
         async ({ params, request }) => {
+          await toggleBarrier;
+
           const body = await request.json() as {
             isDone: boolean;
           };
@@ -287,17 +295,80 @@ describe('Todo', () => {
       },
     );
 
-    await user.click(buyMilkCheckbox);
+    try {
+      await user.click(buyMilkCheckbox);
 
-    await waitFor(() => {
-      expect(buyMilkCheckbox).toBeChecked();
+      await waitFor(() => {
+        expect(buyMilkCheckbox).toBeChecked();
+      });
+
+      await user.click(learnReactCheckbox);
+
+      await waitFor(() => {
+        expect(learnReactCheckbox).not.toBeChecked();
+      });
+    } finally {
+      finishToggle();
+      await waitFor(() => {
+        expect(learnReactCheckbox).toBeEnabled();
+        expect(buyMilkCheckbox).toBeEnabled();
+      });
+    }
+  });
+
+  it('rolls back the optimistic toggle and shows an error', async () => {
+    let finishToggle!: () => void;
+
+    const toggleBarrier = new Promise<void>((resolve) => {
+      finishToggle = resolve;
     });
 
-    await user.click(learnReactCheckbox);
+    setupTasksHandler();
+
+    server.use(
+      http.patch(
+        'http://localhost:3001/tasks/:id',
+        async () => {
+          await toggleBarrier;
+
+          return HttpResponse.json({}, { status: 500 });
+        },
+      ),
+    );
+
+    const user = userEvent.setup();
+
+    renderWithProviders(
+      <MemoryRouter>
+        <Todo />
+        <Toaster />
+      </MemoryRouter>,
+    );
+
+    const buyMilkCheckbox = await screen.findByRole('checkbox', {
+      name: 'Buy milk',
+    });
+
+    try {
+      await user.click(buyMilkCheckbox);
+
+      await waitFor(() => {
+        expect(buyMilkCheckbox).toBeChecked();
+      });
+    } finally {
+      finishToggle();
+
+      await waitFor(() => {
+        expect(buyMilkCheckbox).toBeEnabled();
+      });
+    }
 
     await waitFor(() => {
-      expect(learnReactCheckbox).not.toBeChecked();
+      expect(buyMilkCheckbox).not.toBeChecked();
     });
+    expect(
+      await screen.findByText('The server is temporarily unavailable'),
+    ).toBeVisible();
   });
 
   it('deletes a task when the delete button is clicked', async () => {
