@@ -2,6 +2,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import localAPI from "./local";
 import type { Task } from "./type";
+import type { StorageErrorReason } from "@/shared/errors/StorageError";
 
 const jsdomInstance = (
   globalThis as typeof globalThis & {
@@ -26,6 +27,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
 });
 
@@ -87,6 +89,43 @@ describe('local', () => {
     const tasks = await runWithFakeTimers(() => localAPI.getAll());
 
     expect(tasks).toEqual([createdTask]);
+  });
+
+  it.each<{
+    name: string;
+    error: unknown;
+    reason: StorageErrorReason;
+  }>([
+    {
+      name: 'the storage quota is exceeded',
+      error: new DOMException(
+        'Storage quota exceeded',
+        'QuotaExceededError',
+      ),
+      reason: 'quota-exceeded',
+    },
+    {
+      name: 'the storage is unavailable',
+      error: new DOMException(
+        'Storage access denied',
+        'SecurityError',
+      ),
+      reason: 'unavailable',
+    },
+  ])('throws StorageError when $name', async ({ error, reason }) => {
+    vi.spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw error;
+      });
+
+    const addTaskPromise = localAPI.add('Buy milk');
+    const assertion = expect(addTaskPromise).rejects.toMatchObject({
+      name: 'StorageError',
+      reason,
+    });
+
+    await vi.runAllTimersAsync();
+    await assertion;
   });
 
   it('returns an empty array when stored data is not an array', async () => {

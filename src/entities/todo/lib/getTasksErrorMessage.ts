@@ -20,6 +20,11 @@ export const getTasksErrorMessage = (
                 ? 'The server is temporarily unavailable'
                 : fallback;
 
+        case 'storage':
+            return error.reason === 'quota-exceeded'
+                ? 'Browser storage is full'
+                : 'Unable to save tasks in this browser';
+
         case 'unknown':
             return fallback;
     }

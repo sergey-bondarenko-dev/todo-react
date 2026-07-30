@@ -1,5 +1,9 @@
 import { HttpError } from '@/shared/errors/HttpError';
 import { InvalidResponseError } from '@/shared/errors/InvalidResponseError';
+import {
+    StorageError,
+    type StorageErrorReason,
+} from '@/shared/errors/StorageError';
 
 export type TasksApiError =
   | {
@@ -18,7 +22,12 @@ export type TasksApiError =
   | {
       type: 'unknown';
       message: string;
-  };
+  }
+  | {
+      type: 'storage';
+      message: string;
+      reason: StorageErrorReason;
+    };
 
 export const normalizeTasksApiError = (
     error: unknown,
@@ -45,6 +54,14 @@ export const normalizeTasksApiError = (
         };
     }
 
+    if (error instanceof StorageError) {
+        return {
+            type: 'storage',
+            reason: error.reason,
+            message: error.message,
+        };
+    }
+
     return {
         type: 'unknown',
         message: 'Unknown error',
@@ -68,6 +85,16 @@ export const isTasksApiError = (
         return (
             'status' in error
             && typeof error.status === 'number'
+        );
+    }
+
+    if (error.type === 'storage') {
+        return (
+            'reason' in error
+            && (
+                error.reason === 'quota-exceeded'
+                || error.reason === 'unavailable'
+            )
         );
     }
 
