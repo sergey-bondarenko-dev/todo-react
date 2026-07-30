@@ -22,6 +22,8 @@ test('persists task changes across reloads', async ({ page }) => {
   await taskCheckbox.click();
 
   await expect(taskCheckbox).toBeChecked();
+  await expect(taskCheckbox).toBeDisabled();
+  await expect(taskCheckbox).toBeEnabled();
 
   await page.reload();
 
