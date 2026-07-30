@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 import  { fileURLToPath, URL } from 'node:url'
+import { configDefaults } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -33,7 +34,11 @@ export default defineConfig(({ mode }) => {
         jsdom: {
           url: 'http://localhost/',
         }
-      }
+      },
+      exclude: [
+        ...configDefaults.exclude,
+        'e2e/**',
+      ],
     },
   }
 })
