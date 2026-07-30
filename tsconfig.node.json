@@ -9,9 +9,16 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "types": ["node"],
 
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["vite.config.ts", "eslint.config.js", "stylelint.config.js"]
+  "include": [
+    "vite.config.ts",
+    "eslint.config.js",
+    "stylelint.config.js",
+    "playwright.config.ts",
+    "e2e"
+  ]
 }

@@ -31,6 +31,7 @@
 - ESLint и Stylelint;
 - Vitest, React Testing Library и jest-dom;
 - MSW и jsdom;
+- Playwright;
 - json-server;
 - gh-pages;
 - rollup-plugin-visualizer.
@@ -40,6 +41,7 @@
 Код организован по принципам, близким к Feature-Sliced Design:
 
 ```text
+e2e/               # браузерные сквозные сценарии Playwright
 src/
 ├── app/       # store, маршрутизация и глобальные стили
 ├── pages/     # страницы списка и отдельной задачи
@@ -106,6 +108,8 @@ npm run build:analyze
 
 MSW перехватывает HTTP-запросы на сетевой границе, поэтому интеграционные тесты используют реальные RTK Query endpoints, Redux store и API-адаптер вместо моков импортированных модулей. Для каждого теста создаётся отдельный store, а обработчики MSW сбрасываются между сценариями.
 
+Браузерные e2e-тесты запускаются через Playwright в Chromium. Playwright автоматически поднимает Vite со статическим адаптером, а каждый сценарий выполняется в изолированном browser context со своим `localStorage`.
+
 Тестами покрыты:
 
 - безопасная подсветка поиска и базовые UI-компоненты;
@@ -115,7 +119,9 @@ MSW перехватывает HTTP-запросы на сетевой гран�
 - загрузка, поиск, повторный запрос, переключение и удаление задач;
 - подтверждение и отмена удаления всех задач;
 - ошибки мутаций и toast-уведомления;
-- маршрутизация и страница отдельной задачи.
+- маршрутизация и страница отдельной задачи;
+- сохранение добавления, выполнения и удаления задачи после перезагрузки страницы;
+- переход на страницу задачи и отображение неизвестного маршрута в реальном браузере.
 
 Однократный запуск всего набора:
 
@@ -129,6 +135,18 @@ npm test
 npm run test:watch
 ```
 
+Запуск e2e-тестов в headless Chromium:
+
+```bash
+npm run test:e2e
+```
+
+Интерактивный режим Playwright:
+
+```bash
+npm run test:e2e:ui
+```
+
 ## Требования
 
 - Node.js 22.22 или новее;
@@ -140,6 +158,12 @@ npm run test:watch
 
 ```bash
 npm install
+```
+
+Установить Chromium для запуска e2e-тестов:
+
+```bash
+npx playwright install chromium
 ```
 
 Для разработки с HTTP API запустите два процесса.
@@ -188,6 +212,8 @@ VITE_STATIC_BACKEND=true npm run dev
 | `npm run lint:styles` | Проверить CSS/SCSS через Stylelint |
 | `npm test` | Однократно запустить тесты через Vitest |
 | `npm run test:watch` | Запустить Vitest в режиме наблюдения |
+| `npm run test:e2e` | Запустить e2e-тесты через Playwright в headless Chromium |
+| `npm run test:e2e:ui` | Открыть интерактивный режим Playwright |
 | `npm run deploy` | Собрать и опубликовать приложение через gh-pages |
 
 ## Проверка перед изменениями
@@ -197,10 +223,10 @@ npm run typecheck
 npm run lint
 npm run lint:styles
 npm test
+npm run test:e2e
 npm run build
 ```
 
 ## Что можно улучшить
 
-- добавить браузерные e2e-тесты критических пользовательских сценариев;
 - добавить optimistic updates или undo для изменения и удаления задач.
